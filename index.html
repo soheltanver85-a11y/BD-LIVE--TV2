@@ -1,1 +1,24 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Live TV Website</title>
+    <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
+</head>
+<body style="background-color: #000; color: white; text-align: center;">
+
+    <h1>আমার লাইভ টিভি ওয়েবসাইট</h1>
+    
+    <div style="display: flex; justify-content: center;">
+        <video id="my-video" class="video-js vjs-big-play-centered" controls preload="auto" width="640" height="360" data-setup='{}'>
+            <source src="https://raw.githubusercontent.com/soheltanver85-a11y/Live-tv2/refs/heads/main/Live-tv2" type="application/x-mpegURL">
+        </video>
+    </div>
+
+    <p>চ্যানেল লোড না হলে আপনার লিঙ্কটি সঠিক আছে কিনা চেক করুন।</p>
+
+    <script src="https://vjs.zencdn.net/7.20.3/video.min.js"></script>
+</body>
+</html>
