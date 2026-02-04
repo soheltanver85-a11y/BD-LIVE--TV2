@@ -1,24 +1,91 @@
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Live TV Website</title>
+    <title>Android TV Live Player</title>
     <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
-</head>
-<body style="background-color: #000; color: white; text-align: center;">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+        }
 
-    <h1>আমার লাইভ টিভি ওয়েবসাইট</h1>
-    
-    <div style="display: flex; justify-content: center;">
-        <video id="my-video" class="video-js vjs-big-play-centered" controls preload="auto" width="640" height="360" data-setup='{}'>
+        /* টিভি স্ক্রিনে ভিডিও প্লেয়ারটি যেন পুরো বড় দেখায় */
+        .video-container {
+            width: 90vw;
+            height: 80vh;
+            border: 5px solid #333;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 0 50px rgba(0, 255, 0, 0.2);
+        }
+
+        .video-js {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        /* রিমোট দিয়ে কন্ট্রোল করার জন্য বড় বাটন */
+        .vjs-big-play-button {
+            line-height: 2em !important;
+            height: 2em !important;
+            width: 2em !important;
+            border-radius: 50% !important;
+            left: 50% !important;
+            top: 50% !important;
+            margin-left: -1em !important;
+            margin-top: -1em !important;
+        }
+
+        /* টিভির জন্য বিশেষ নির্দেশনা */
+        .tv-hint {
+            position: absolute;
+            bottom: 20px;
+            color: #777;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="video-container">
+        <video id="tv-player" class="video-js vjs-big-play-centered vjs-theme-city" controls preload="auto" data-setup='{}'>
             <source src="https://raw.githubusercontent.com/soheltanver85-a11y/Live-tv2/refs/heads/main/Live-tv2" type="application/x-mpegURL">
+            <p class="vjs-no-js">
+                এই ব্রাউজারটি ভিডিও সাপোর্ট করছে না।
+            </p>
         </video>
     </div>
 
-    <p>চ্যানেল লোড না হলে আপনার লিঙ্কটি সঠিক আছে কিনা চেক করুন।</p>
+    <div class="tv-hint">রিমোটের "OK" বাটন চেপে প্লে/পজ করুন</div>
 
     <script src="https://vjs.zencdn.net/7.20.3/video.min.js"></script>
+
+    <script>
+        // রিমোট কন্ট্রোল সাপোর্ট করার জন্য স্ক্রিপ্ট
+        var player = videojs('tv-player');
+
+        // পেজ লোড হলে প্লেয়ারে ফোকাস করা (যাতে রিমোট কাজ করে)
+        document.getElementById('tv-player').focus();
+
+        // রিমোটের কি-বোর্ড ইভেন্ট হ্যান্ডল করা
+        document.addEventListener('keydown', function(event) {
+            if (event.keyCode === 13) { // 13 মানে রিমোটের 'OK' বা 'Enter' বাটন
+                if (player.paused()) {
+                    player.play();
+                } else {
+                    player.pause();
+                }
+            }
+        });
+    </script>
 </body>
 </html>
