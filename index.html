@@ -3,29 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Android TV Live Player</title>
+    <title>Live TV - Android TV Edition</title>
+    
     <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
+    <link href="https://unpkg.com/@videojs/themes@1.0.1/dist/city/index.css" rel="stylesheet">
+
     <style>
-        body {
+        /* টিভির জন্য ফুল স্ক্রিন ডিজাইন */
+        body, html {
             margin: 0;
             padding: 0;
+            width: 100%;
+            height: 100%;
             background-color: #000;
+            overflow: hidden;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            overflow: hidden;
-            font-family: Arial, sans-serif;
         }
 
-        /* টিভি স্ক্রিনে ভিডিও প্লেয়ারটি যেন পুরো বড় দেখায় */
-        .video-container {
-            width: 90vw;
-            height: 80vh;
-            border: 5px solid #333;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 0 50px rgba(0, 255, 0, 0.2);
+        .video-wrapper {
+            width: 100vw;
+            height: 100vh;
+            background: radial-gradient(circle, #1a1a1a 0%, #000 100%);
         }
 
         .video-js {
@@ -33,58 +33,79 @@
             height: 100% !important;
         }
 
-        /* রিমোট দিয়ে কন্ট্রোল করার জন্য বড় বাটন */
+        /* রিমোট কন্ট্রোল দিয়ে দেখার জন্য বড় প্লে বাটন */
         .vjs-big-play-button {
-            line-height: 2em !important;
-            height: 2em !important;
-            width: 2em !important;
+            background-color: rgba(255, 0, 0, 0.7) !important;
+            border: none !important;
+            width: 100px !important;
+            height: 100px !important;
+            line-height: 100px !important;
             border-radius: 50% !important;
-            left: 50% !important;
             top: 50% !important;
-            margin-left: -1em !important;
-            margin-top: -1em !important;
+            left: 50% !important;
+            margin-top: -50px !important;
+            margin-left: -50px !important;
         }
 
-        /* টিভির জন্য বিশেষ নির্দেশনা */
-        .tv-hint {
+        /* লোডিং স্পিনার ডিজাইন */
+        .vjs-loading-spinner {
+            border: 6px solid rgba(255, 0, 0, 0.5) !important;
+        }
+
+        /* টিভির নিচের টেক্সট */
+        .tv-status {
             position: absolute;
             bottom: 20px;
-            color: #777;
-            font-size: 18px;
+            left: 30px;
+            color: rgba(255, 255, 255, 0.5);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 14px;
+            z-index: 10;
         }
     </style>
 </head>
 <body>
 
-    <div class="video-container">
-        <video id="tv-player" class="video-js vjs-big-play-centered vjs-theme-city" controls preload="auto" data-setup='{}'>
+    <div class="video-wrapper">
+        <div class="tv-status">Android TV Mode | High Quality Stream</div>
+        
+        <video id="android-tv-player" class="video-js vjs-theme-city vjs-big-play-centered" controls autoplay preload="auto">
             <source src="https://raw.githubusercontent.com/soheltanver85-a11y/Live-tv2/refs/heads/main/Live-tv2" type="application/x-mpegURL">
-            <p class="vjs-no-js">
-                এই ব্রাউজারটি ভিডিও সাপোর্ট করছে না।
-            </p>
+            <p class="vjs-no-js">আপনার ব্রাউজারটি ভিডিও সাপোর্ট করছে না।</p>
         </video>
     </div>
-
-    <div class="tv-hint">রিমোটের "OK" বাটন চেপে প্লে/পজ করুন</div>
 
     <script src="https://vjs.zencdn.net/7.20.3/video.min.js"></script>
 
     <script>
-        // রিমোট কন্ট্রোল সাপোর্ট করার জন্য স্ক্রিপ্ট
-        var player = videojs('tv-player');
+        var player = videojs('android-tv-player', {
+            autoplay: true,
+            fluid: true,
+            playbackRates: [0.5, 1, 1.5, 2]
+        });
 
-        // পেজ লোড হলে প্লেয়ারে ফোকাস করা (যাতে রিমোট কাজ করে)
-        document.getElementById('tv-player').focus();
-
-        // রিমোটের কি-বোর্ড ইভেন্ট হ্যান্ডল করা
-        document.addEventListener('keydown', function(event) {
-            if (event.keyCode === 13) { // 13 মানে রিমোটের 'OK' বা 'Enter' বাটন
+        // ১. রিমোটের 'OK' বা 'Enter' বাটন সাপোর্ট
+        document.addEventListener('keydown', function(e) {
+            if (e.keyCode === 13) { // 13 = Enter/OK button
                 if (player.paused()) {
                     player.play();
                 } else {
                     player.pause();
                 }
             }
+            
+            // ২. রিমোটের বাম/ডান বাটন দিয়ে ১০ সেকেন্ড আগানো বা পেছানো
+            if (e.keyCode === 39) { // Right Arrow
+                player.currentTime(player.currentTime() + 10);
+            }
+            if (e.keyCode === 37) { // Left Arrow
+                player.currentTime(player.currentTime() - 10);
+            }
+        });
+
+        // এরর হ্যান্ডলিং (যদি লিঙ্ক কাজ না করে)
+        player.on('error', function() {
+            console.log("ভিডিও লোড হতে সমস্যা হচ্ছে। লিঙ্কটি চেক করুন।");
         });
     </script>
 </body>
