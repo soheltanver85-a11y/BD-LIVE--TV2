@@ -3,130 +3,132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live TV Pro - Ultimate Edition</title>
-    <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
+    <title>Lite TV Pro</title>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <style>
-        :root { --accent: #ff0055; --bg: #000; }
-        body, html { margin: 0; padding: 0; background: var(--bg); color: white; font-family: 'Roboto', sans-serif; overflow: hidden; height: 100%; }
+        :root { --main: #ff0040; --bg: #050505; }
+        body, html { margin: 0; padding: 0; background: var(--bg); color: #fff; font-family: sans-serif; overflow: hidden; height: 100%; }
 
-        .video-wrapper { width: 100%; height: 60vh; background: #000; position: relative; }
-        .video-js { width: 100% !important; height: 100% !important; }
+        /* প্লেয়ার সেকশন - মেমরি সাশ্রয়ী ডিজাইন */
+        .video-box { width: 100%; height: 55vh; background: #000; position: relative; }
+        video { width: 100%; height: 100%; outline: none; background: #000; }
 
-        .list-container { height: 40vh; padding: 20px; overflow-y: auto; }
-        .channel-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 20px; }
+        /* চ্যানেল গ্রিড - ল্যাগ ফ্রি স্ক্রলিং */
+        .list-area { height: 45vh; padding: 15px; overflow-y: auto; scroll-behavior: smooth; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 15px; }
 
-        .tv-card {
-            background: #111; border-radius: 15px; padding: 15px; text-align: center;
-            cursor: pointer; border: 3px solid transparent; outline: none;
-            transition: 0.2s ease-in-out;
+        /* কার্ড ডিজাইন */
+        .card { 
+            background: #111; border-radius: 12px; padding: 10px; text-align: center;
+            cursor: pointer; border: 2px solid transparent; outline: none; transition: 0.2s;
         }
-        .tv-card:focus { transform: scale(1.1); border-color: var(--accent); box-shadow: 0 0 20px var(--accent); }
+        .card:focus { transform: scale(1.1); border-color: var(--main); background: #1a1a1a; }
 
-        .logo-circle { width: 80px; height: 80px; background: #fff; border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-        .logo-circle img { width: 75%; height: auto; }
-        .name-text { font-size: 14px; color: #ddd; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .logo { width: 70px; height: 70px; background: #fff; border-radius: 50%; margin: 0 auto 8px; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+        .logo img { width: 80%; height: auto; }
+        .name { font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #ccc; }
 
-        /* অন-স্ক্রিন নোটিফিকেশন (চ্যানেল ও ভলিউম) */
-        .status-overlay {
-            position: absolute; top: 20px; left: 20px; background: rgba(0,0,0,0.8);
-            padding: 10px 20px; border-radius: 8px; display: none; z-index: 10;
-            border-left: 5px solid var(--accent); font-weight: bold;
-        }
+        /* ভলিউম ও চ্যানেল ইনফো পপআপ */
+        #msg { position: absolute; top: 20px; left: 20px; background: rgba(0,0,0,0.8); padding: 8px 15px; border-radius: 5px; display: none; border-left: 4px solid var(--main); font-weight: bold; z-index: 10; }
     </style>
 </head>
 <body>
 
-    <div class="video-wrapper">
-        <div id="status-info" class="status-overlay"></div>
-        <video id="tv-player" class="video-js vjs-big-play-centered" controls autoplay preload="auto"></video>
+    <div class="video-box">
+        <div id="msg"></div>
+        <video id="video" autoplay controls></video>
     </div>
 
-    <div class="list-container">
-        <div class="channel-grid" id="main-grid">
-            <div style="padding: 20px;">চ্যানেল লোড হচ্ছে...</div>
+    <div class="list-area">
+        <div class="grid" id="grid">
+            <div style="padding: 20px;">অপেক্ষা করুন...</div>
         </div>
     </div>
 
-    <script src="https://vjs.zencdn.net/7.20.3/video.min.js"></script>
     <script>
         const m3uUrl = 'https://raw.githubusercontent.com/soheltanver85-a11y/Live-tv2/refs/heads/main/Live-tv2';
-        const player = videojs('tv-player');
+        const video = document.getElementById('video');
         let channels = [];
-        let currentIndex = 0;
+        let curIdx = 0;
 
-        async function initApp() {
-            try {
-                const res = await fetch(m3uUrl);
-                const text = await res.text();
-                const lines = text.split('\n');
-                let tempName = '', tempLogo = '';
-
-                lines.forEach(line => {
-                    if (line.startsWith('#EXTINF')) {
-                        tempName = line.split(',')[1] || 'Unknown';
-                        const logoMatch = line.match(/tvg-logo="(.*?)"/);
-                        tempLogo = logoMatch ? logoMatch[1] : '';
-                    } else if (line.startsWith('http')) {
-                        channels.push({ name: tempName, logo: tempLogo, url: line.trim() });
-                    }
-                });
-                renderGrid();
-                if(channels.length > 0) playChannel(0);
-            } catch (e) { console.error("Update Error!"); }
+        // স্ট্রিমিং ইঞ্জিন (HLS.js) - যা ল্যাগ কমায়
+        function playStream(url) {
+            if (Hls.isSupported()) {
+                const hls = new Hls();
+                hls.loadSource(url);
+                hls.attachMedia(video);
+            } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                video.src = url;
+            }
+            video.play();
         }
 
-        function renderGrid() {
-            const grid = document.getElementById('main-grid');
-            grid.innerHTML = channels.map((ch, i) => `
-                <div class="tv-card" tabindex="0" id="ch-${i}" onclick="playChannel(${i})">
-                    <div class="logo-circle"><img src="${ch.logo}" onerror="this.src='https://via.placeholder.com/100?text=TV'"></div>
-                    <div class="name-text">${ch.name}</div>
+        async function init() {
+            try {
+                const res = await fetch(m3uUrl);
+                const data = await res.text();
+                const lines = data.split('\n');
+                
+                let name = '', logo = '';
+                lines.forEach(line => {
+                    if (line.startsWith('#EXTINF')) {
+                        name = line.split(',')[1] || 'Unknown';
+                        const logoMatch = line.match(/tvg-logo="(.*?)"/);
+                        logo = logoMatch ? logoMatch[1] : '';
+                    } else if (line.startsWith('http')) {
+                        channels.push({ name, logo, url: line.trim() });
+                    }
+                });
+                render();
+                if(channels.length > 0) select(0);
+            } catch (e) { alert("Internet error!"); }
+        }
+
+        function render() {
+            const container = document.getElementById('grid');
+            container.innerHTML = channels.map((ch, i) => `
+                <div class="card" tabindex="0" id="ch-${i}" onclick="select(${i})">
+                    <div class="logo"><img src="${ch.logo}" onerror="this.src='https://via.placeholder.com/100?text=TV'"></div>
+                    <div class="name">${ch.name}</div>
                 </div>
             `).join('');
         }
 
-        function showStatus(text) {
-            const statusBox = document.getElementById('status-info');
-            statusBox.innerText = text;
-            statusBox.style.display = 'block';
-            clearTimeout(window.statusTimeout);
-            window.statusTimeout = setTimeout(() => statusBox.style.display = 'none', 3000);
+        function showInfo(txt) {
+            const box = document.getElementById('msg');
+            box.innerText = txt; box.style.display = 'block';
+            clearTimeout(window.t);
+            window.t = setTimeout(() => box.style.display = 'none', 3000);
         }
 
-        function playChannel(index) {
-            if(index < 0) index = channels.length - 1;
-            if(index >= channels.length) index = 0;
-            currentIndex = index;
-            const ch = channels[currentIndex];
-            player.src({ src: ch.url, type: 'application/x-mpegURL' });
-            player.play();
-            showStatus("📺 " + ch.name);
-            const el = document.getElementById(`ch-${index}`);
+        function select(i) {
+            if(i < 0) i = channels.length - 1;
+            if(i >= channels.length) i = 0;
+            curIdx = i;
+            playStream(channels[i].url);
+            showInfo("📺 " + channels[i].name);
+            const el = document.getElementById(`ch-${i}`);
             if(el) el.focus();
         }
 
-        // রিমোট কন্ট্রোল হ্যান্ডলার
+        // রিমোট বাটন (Fast Navigation)
         document.addEventListener('keydown', (e) => {
-            if (e.keyCode === 39) { // Right - Next Channel
-                playChannel(currentIndex + 1);
-            } else if (e.keyCode === 37) { // Left - Previous Channel
-                playChannel(currentIndex - 1);
-            } else if (e.keyCode === 38) { // Up - Volume Up
-                e.preventDefault();
-                let vol = player.volume();
-                player.volume(Math.min(vol + 0.1, 1));
-                showStatus("🔊 Volume: " + Math.round(player.volume() * 100) + "%");
-            } else if (e.keyCode === 40) { // Down - Volume Down
-                e.preventDefault();
-                let vol = player.volume();
-                player.volume(Math.max(vol - 0.1, 0));
-                showStatus("🔉 Volume: " + Math.round(player.volume() * 100) + "%");
-            } else if (e.keyCode === 13) { // OK - Play/Pause
-                if (player.paused()) player.play(); else player.pause();
+            if (e.keyCode === 39) select(curIdx + 1); // Right
+            if (e.keyCode === 37) select(curIdx - 1); // Left
+            if (e.keyCode === 38) { // Up (Vol+)
+                video.volume = Math.min(video.volume + 0.1, 1);
+                showInfo("🔊 Volume: " + Math.round(video.volume * 100) + "%");
+            }
+            if (e.keyCode === 40) { // Down (Vol-)
+                video.volume = Math.max(video.volume - 0.1, 0);
+                showInfo("🔉 Volume: " + Math.round(video.volume * 100) + "%");
+            }
+            if (e.keyCode === 13) { // OK
+                video.paused ? video.play() : video.pause();
             }
         });
 
-        initApp();
+        init();
     </script>
 </body>
 </html>
