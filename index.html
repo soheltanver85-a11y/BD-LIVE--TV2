@@ -3,209 +3,208 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ultimate Universal TV</title>
+    <title>Elite Universal TV Pro</title>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --primary: #ff0040;
-            --bg: #050505;
-            --card-bg: #121212;
-            --text: #ffffff;
+        :root { --primary: #e50914; --bg: #0a0a0a; --card: #1a1a1a; --text: #ffffff; }
+        
+        body, html { 
+            margin: 0; padding: 0; background: var(--bg); color: var(--text);
+            font-family: 'Poppins', sans-serif; min-height: 100vh;
+            overflow-x: hidden; overflow-y: auto; overscroll-behavior-y: auto;
         }
 
-        /* ১. বডি সেটিংস - স্ক্রলিং এবং রিফ্রেশ সচল করা */
-        body, html {
-            margin: 0; padding: 0; background: var(--bg);
-            color: var(--text); font-family: 'Poppins', sans-serif;
-            min-height: 100vh; width: 100%;
-            overflow-x: hidden;
-            overflow-y: auto; /* মোবাইলে স্ক্রল করার জন্য */
-            overscroll-behavior-y: auto; /* রিফ্রেশ এর জন্য */
+        .app-container { display: flex; flex-direction: row; min-height: 100vh; }
+
+        /* ১. সাইডবার (শুধুমাত্র টিভির জন্য বামে থাকবে) */
+        .sidebar {
+            width: 90px; background: #000; display: flex; flex-direction: column;
+            align-items: center; padding-top: 30px; gap: 20px;
+            border-right: 1px solid #222; position: sticky; top: 0; height: 100vh;
+            z-index: 1000;
         }
 
-        /* ২. ভিডিও প্লেয়ার (মোবাইলে স্ক্রল করলে ওপরে চলে যাবে) */
-        .video-container {
-            width: 100%; height: 35vh; background: #000;
-            position: relative; z-index: 100;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        .main-content { flex: 1; display: flex; flex-direction: column; }
+
+        /* ২. ভিডিও প্লেয়ার (ফিক্সড) */
+        .video-box {
+            width: 100%; height: 50vh; background: #000; position: sticky; top: 0; z-index: 500;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
         video { width: 100%; height: 100%; object-fit: contain; }
 
-        /* ৩. মেইন কন্টেনার */
-        .main-wrapper {
-            display: flex; flex-direction: column; width: 100%;
+        /* ৩. ক্যাটাগরি ও সার্চ বার (একত্রে ওপরে) */
+        .controls-area {
+            background: var(--bg); position: sticky; top: 50vh; z-index: 400;
+            border-bottom: 1px solid #222; padding: 10px 0;
         }
 
-        /* ৪. সার্চ ও ক্যাটাগরি প্যানেল */
-        .nav-panel {
-            padding: 15px; background: var(--bg);
-            border-bottom: 1px solid #1a1a1a;
-            position: sticky; top: 0; z-index: 99;
-            display: flex; gap: 10px; align-items: center;
-        }
-        .search-box {
-            flex: 1; background: #222; border: 1px solid #333;
-            padding: 10px 15px; border-radius: 8px; color: #fff; outline: none;
-        }
-        .search-box:focus { border-color: var(--primary); }
-
-        /* ৫. চ্যানেল গ্রিড */
-        .grid-layout {
-            padding: 15px;
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-            gap: 15px;
-            padding-bottom: 100px;
+        .search-container { padding: 0 20px 10px 20px; }
+        .search-input {
+            width: 100%; background: #222; border: 1px solid #333; padding: 10px 15px;
+            border-radius: 8px; color: #fff; outline: none; box-sizing: border-box;
         }
 
-        /* ৬. টিভি এবং মোবাইল কার্ড */
-        .tv-card {
-            background: var(--card-bg); border-radius: 12px; padding: 12px;
-            text-align: center; border: 2px solid transparent; transition: 0.3s;
-            outline: none; cursor: pointer;
+        /* মোবাইলে ক্যাটাগরি লিস্ট (Horizontal Scroll) */
+        .cat-scroll {
+            display: flex; overflow-x: auto; white-space: nowrap; padding: 5px 20px; gap: 10px;
         }
-        .tv-card:focus, .tv-card:hover {
-            transform: scale(1.08); border-color: var(--primary);
-            box-shadow: 0 10px 20px rgba(255, 0, 64, 0.4);
-            background: #1a1a1a;
-        }
-        .tv-card img { width: 70px; height: 70px; object-fit: contain; border-radius: 8px; }
-        .tv-card .name { font-size: 13px; margin-top: 8px; font-weight: 500; display: block; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
-
-        /* ৭. টিভির জন্য সাইডবার (শুধুমাত্র বড় স্ক্রিনে) */
-        @media (min-width: 769px) {
-            .app-main { display: flex; }
-            .sidebar {
-                width: 80px; height: 100vh; background: #000;
-                position: sticky; top: 0; display: flex;
-                flex-direction: column; align-items: center; padding-top: 30px; gap: 20px;
-            }
-            .video-container { height: 55vh; } /* টিভিতে প্লেয়ার বড় */
-        }
-
-        /* ৮. মোবাইল বটম নেভিগেশন */
-        @media (max-width: 768px) {
-            .sidebar {
-                position: fixed; bottom: 0; left: 0; width: 100%;
-                height: 60px; background: #000; display: flex;
-                justify-content: space-around; align-items: center;
-                border-top: 1px solid #1a1a1a; z-index: 200;
-            }
-        }
+        .cat-scroll::-webkit-scrollbar { display: none; }
 
         .nav-btn {
-            background: none; border: none; color: #666; font-size: 22px;
-            cursor: pointer; outline: none; transition: 0.3s;
+            background: #222; border: none; color: #aaa; padding: 8px 18px;
+            border-radius: 20px; cursor: pointer; font-size: 14px; transition: 0.3s;
+            outline: none; flex-shrink: 0;
         }
-        .nav-btn.active, .nav-btn:focus { color: var(--primary); transform: scale(1.2); }
+        .nav-btn.active, .nav-btn:focus { background: var(--primary); color: #fff; transform: scale(1.05); }
+
+        /* ৪. চ্যানেল গ্রিড */
+        .grid {
+            display: grid; padding: 20px; gap: 15px;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+        }
+
+        .card {
+            background: var(--card); border-radius: 12px; padding: 12px; text-align: center;
+            border: 2px solid transparent; transition: 0.2s; cursor: pointer; outline: none;
+        }
+        .card:focus { transform: scale(1.08); border-color: var(--primary); background: #222; }
+        .card img { width: 70px; height: 70px; object-fit: contain; margin-bottom: 8px; border-radius: 8px; }
+        .card span { font-size: 13px; font-weight: 500; display: block; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+
+        /* মোবাইল স্ক্রিন সেটিংস (ক্যাটাগরি ওপরে রাখার জন্য) */
+        @media (max-width: 768px) {
+            .app-container { flex-direction: column; }
+            .sidebar { display: none; } /* মোবাইলে সাইডবার উধাও */
+            .video-box { height: 30vh; }
+            .controls-area { top: 30vh; } /* প্লেয়ারের ঠিক নিচে থাকবে */
+            .grid { grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); padding: 10px; }
+            .card img { width: 55px; height: 55px; }
+        }
+
+        /* টিভির জন্য ক্যাটাগরি বামে রাখতে */
+        @media (min-width: 769px) {
+            .cat-scroll { flex-direction: column; height: auto; }
+            .controls-area { position: static; border: none; }
+            .nav-btn { width: 60px; height: 60px; border-radius: 15px; padding: 0; font-size: 22px; }
+        }
     </style>
 </head>
 <body>
 
-    <div class="video-container">
-        <video id="main-player" controls poster="https://via.placeholder.com/800?text=Live+TV+Pro"></video>
-    </div>
+    <div class="app-container">
+        <nav class="sidebar" id="sidebar-nav">
+            </nav>
 
-    <div class="app-main">
-        <nav class="sidebar">
-            <button class="nav-btn active" onclick="filterData('All', this)">🏠</button>
-            <button class="nav-btn" onclick="filterData('বাংলা', this)">🇧🇩</button>
-            <button class="nav-btn" onclick="filterData('হিন্দি', this)">🇮🇳</button>
-            <button class="nav-btn" onclick="filterData('Sports', this)">⚽</button>
-        </nav>
-
-        <div class="main-wrapper">
-            <div class="nav-panel">
-                <input type="text" id="search" class="search-box" placeholder="চ্যানেল খুঁজুন..." oninput="doSearch()">
+        <main class="main-content">
+            <div class="video-box">
+                <video id="player" controls poster="https://via.placeholder.com/800?text=Live+TV+Pro"></video>
             </div>
 
-            <div class="grid-layout" id="channel-grid">
+            <div class="controls-area">
+                <div class="search-container">
+                    <input type="text" class="search-input" id="search" placeholder="সার্চ করুন..." oninput="search()">
                 </div>
-        </div>
+                <div class="cat-scroll" id="cat-list">
+                    <button class="nav-btn active" onclick="filter('All', this)">🏠 All</button>
+                    <button class="nav-btn" onclick="filter('বাংলা', this)">🇧🇩 বাংলা</button>
+                    <button class="nav-btn" onclick="filter('হিন্দি', this)">🇮🇳 হিন্দি</button>
+                    <button class="nav-btn" onclick="filter('Sports', this)">⚽ খেলা</button>
+                </div>
+            </div>
+
+            <div class="grid" id="grid">
+                </div>
+        </main>
     </div>
 
     <script>
-        const m3uUrl = 'https://raw.githubusercontent.com/soheltanver85-a11y/Live-tv2/refs/heads/main/Live-tv2';
-        const video = document.getElementById('main-player');
+        const m3u = 'https://raw.githubusercontent.com/soheltanver85-a11y/Live-tv2/refs/heads/main/Live-tv2';
+        const video = document.getElementById('player');
         let channels = [];
 
-        async function fetchChannels() {
+        async function init() {
             try {
-                const response = await fetch(m3uUrl);
-                const text = await response.text();
-                parseM3U(text);
-                renderChannels(channels);
-            } catch (err) { alert("ডাটা লোড করতে সমস্যা হচ্ছে!"); }
+                const res = await fetch(m3u);
+                const text = await res.text();
+                parse(text);
+                render(channels);
+                setupTVNav();
+            } catch (e) { console.log("Error loading list"); }
         }
 
-        function parseM3U(data) {
+        function parse(data) {
             const lines = data.split('\n');
-            let item = {};
-            lines.forEach(line => {
-                if (line.startsWith('#EXTINF')) {
-                    item.name = line.split(',')[1]?.trim() || "TV Channel";
-                    item.logo = line.match(/tvg-logo="(.*?)"/)?.[1] || "";
-                    item.group = line.match(/group-title="(.*?)"/)?.[1] || "All";
-                } else if (line.startsWith('http')) {
-                    item.url = line.trim();
-                    channels.push({...item});
-                    item = {};
+            let ch = {};
+            lines.forEach(l => {
+                if (l.startsWith('#EXTINF')) {
+                    ch.name = l.split(',')[1]?.trim() || "Unknown";
+                    ch.logo = l.match(/tvg-logo="(.*?)"/)?.[1] || "";
+                    ch.group = l.match(/group-title="(.*?)"/)?.[1] || "All";
+                } else if (l.startsWith('http')) {
+                    ch.url = l.trim();
+                    channels.push({...ch});
+                    ch = {};
                 }
             });
         }
 
-        function renderChannels(list) {
-            const grid = document.getElementById('channel-grid');
-            grid.innerHTML = list.map(ch => `
-                <div class="tv-card" tabindex="0" onclick="playStream('${ch.url}')">
-                    <img src="${ch.logo}" onerror="this.src='https://via.placeholder.com/100/222/fff?text=TV'">
-                    <span class="name">${ch.name}</span>
+        function render(list) {
+            const g = document.getElementById('grid');
+            g.innerHTML = list.map(c => `
+                <div class="card" tabindex="0" onclick="play('${c.url}')">
+                    <img src="${c.logo}" onerror="this.src='https://via.placeholder.com/100/222/fff?text=TV'">
+                    <span>${c.name}</span>
                 </div>
             `).join('');
         }
 
-        function playStream(url) {
+        function play(url) {
             if (Hls.isSupported()) {
                 const hls = new Hls();
                 hls.loadSource(url);
                 hls.attachMedia(video);
                 hls.on(Hls.Events.MANIFEST_PARSED, () => video.play());
-            } else {
-                video.src = url; video.play();
-            }
-            // ভিডিও প্লে হলে স্ক্রিন ওপরে নিয়ে যাবে (মোবাইলে সুবিধা)
+            } else { video.src = url; video.play(); }
             window.scrollTo({top: 0, behavior: 'smooth'});
         }
 
-        function filterData(cat, btn) {
+        function filter(cat, btn) {
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            const filtered = (cat === 'All') ? channels : channels.filter(c => 
+            const res = (cat === 'All') ? channels : channels.filter(c => 
                 c.group.toLowerCase().includes(cat.toLowerCase()) || 
                 c.name.toLowerCase().includes(cat.toLowerCase())
             );
-            renderChannels(filtered);
+            render(res);
         }
 
-        function doSearch() {
+        function search() {
             const q = document.getElementById('search').value.toLowerCase();
-            const filtered = channels.filter(c => c.name.toLowerCase().includes(q));
-            renderChannels(filtered);
+            const res = channels.filter(c => c.name.toLowerCase().includes(q));
+            render(res);
         }
 
-        // টিভির রিমোট হ্যান্ডলিং
+        // টিভির সাইডবারে ক্যাটাগরি কপি করা
+        function setupTVNav() {
+            const sidebar = document.getElementById('sidebar-nav');
+            const cats = document.getElementById('cat-list').innerHTML;
+            sidebar.innerHTML = cats;
+        }
+
+        // রিমোট কন্ট্রোল সাপোর্ট
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') document.activeElement.click();
+            const active = document.activeElement;
+            if (e.key === 'Enter') active.click();
             setTimeout(() => {
-                const active = document.activeElement;
-                if (active.classList.contains('tv-card')) {
+                if (active.classList.contains('card')) {
                     active.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 }
             }, 50);
         });
 
-        fetchChannels();
+        init();
     </script>
 </body>
 </html>
