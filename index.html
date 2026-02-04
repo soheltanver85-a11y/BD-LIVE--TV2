@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Universal TV - Android TV Edition</title>
+    <title>Universal TV - Search & Auto-Play Edition</title>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <style>
         :root { --primary: #e50914; --bg: #0a0a0a; --card: #1a1a1a; --text: #ffffff; --focus: #ffffff; }
@@ -17,16 +17,24 @@
 
         .sidebar {
             width: 80px; background: #000; display: flex; flex-direction: column;
-            align-items: center; padding-top: 30px; gap: 20px; border-right: 1px solid #222;
+            align-items: center; padding-top: 20px; gap: 20px; border-right: 1px solid #222;
         }
 
         .main-content { flex: 1; display: flex; flex-direction: column; height: 100vh; }
 
-        .video-box { width: 100%; height: 50vh; background: #000; position: relative; cursor: pointer; }
+        .video-box { width: 100%; height: 45vh; background: #000; position: relative; cursor: pointer; }
         video { width: 100%; height: 100%; object-fit: contain; }
 
-        .controls-wrapper { background: var(--bg); border-bottom: 1px solid #222; padding: 10px 0; }
-        .cat-bar { display: flex; overflow-x: auto; white-space: nowrap; padding: 0 15px; gap: 10px; }
+        /* সার্চ এবং ফিল্টার বার */
+        .top-controls { background: var(--bg); border-bottom: 1px solid #222; padding: 10px 15px; }
+        
+        .search-box {
+            width: 95%; background: #222; border: 2px solid transparent; color: #fff;
+            padding: 10px; border-radius: 8px; font-size: 16px; outline: none; margin-bottom: 10px;
+        }
+        .search-box:focus { border-color: var(--primary); background: #333; }
+
+        .cat-bar { display: flex; overflow-x: auto; white-space: nowrap; gap: 10px; }
         .cat-bar::-webkit-scrollbar { display: none; }
 
         .nav-btn {
@@ -48,12 +56,10 @@
             position: relative;
         }
         .card:focus { border-color: var(--focus); transform: scale(1.08); background: #252525; }
-        .card.is-fav { background: #151d25; }
 
-        .card img { width: 70px; height: 70px; object-fit: contain; margin-bottom: 8px; pointer-events: none; }
+        .card img { width: 60px; height: 60px; object-fit: contain; margin-bottom: 8px; pointer-events: none; }
         .card span { font-size: 14px; font-weight: bold; display: block; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 
-        /* লোডিং স্পিনার */
         #loader {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
             border: 4px solid #f3f3f3; border-top: 4px solid var(--primary);
@@ -77,7 +83,9 @@
                 <video id="player" autoplay></video>
             </div>
 
-            <div class="controls-wrapper">
+            <div class="top-controls">
+                <input type="text" id="searchInput" class="search-box" placeholder="চ্যানেলের নাম লিখুন..." oninput="searchChannel(this.value)">
+                
                 <div class="cat-bar">
                     <button class="nav-btn active" onclick="filter('All', this)">All</button>
                     <button class="nav-btn" onclick="filter('Favorite', this)">Favorite</button>
@@ -106,6 +114,11 @@
                 parse(text);
                 filteredChannels = [...channels];
                 render(filteredChannels);
+                
+                // লাস্ট ওয়াচড চ্যানেল প্লে করা
+                const lastUrl = localStorage.getItem('last_tv_url');
+                if(lastUrl) play(lastUrl);
+                
                 document.getElementById('home-btn').focus();
             } catch (e) { console.log("Load error"); }
         }
@@ -128,6 +141,10 @@
 
         function render(list) {
             const g = document.getElementById('grid');
+            if (list.length === 0) {
+                g.innerHTML = `<p style="padding:20px">চ্যানেল পাওয়া যায়নি!</p>`;
+                return;
+            }
             g.innerHTML = list.map(c => {
                 const isFav = favorites.includes(c.url);
                 return `
@@ -141,7 +158,14 @@
             `}).join('');
         }
 
-        // নেক্সট/প্রিভিয়াস চ্যানেল লজিক
+        // সার্চ ফাংশন
+        function searchChannel(query) {
+            const res = channels.filter(c => c.name.toLowerCase().includes(query.toLowerCase()));
+            filteredChannels = res;
+            render(res);
+        }
+
+        // নেক্সট/প্রিভিয়াস চ্যানেল সুইচ
         function switchChannel(direction) {
             let index = filteredChannels.findIndex(c => c.url === currentUrl);
             if (direction === 'next') index = (index + 1) % filteredChannels.length;
@@ -160,22 +184,18 @@
                 else if (active.id === 'v-container') toggleFullScreen();
             }
 
-            // রিমোটের Channel Up/Down (বা কিবোর্ডের [ ] ব্র্যাকেট) দিয়ে চ্যানেল বদলানো
-            if (e.keyCode === 166 || e.key === 'ArrowUp' && active.id === 'v-container') switchChannel('prev');
-            if (e.keyCode === 167 || e.key === 'ArrowDown' && active.id === 'v-container') switchChannel('next');
-
-            // ব্যাক বাটন চাপলে ফুলস্ক্রিন থেকে বের হওয়া বা গ্রিডে ফোকাস করা
-            if (e.key === 'Backspace' || e.key === 'Escape') {
-                if (document.fullscreenElement) {
-                    document.exitFullscreen();
-                    e.preventDefault();
-                }
+            // চ্যানেল চেঞ্জ লজিক (রিমোটের Up/Down বা কিবোর্ড কি)
+            if (active.id === 'v-container') {
+                if (e.key === 'ArrowUp') switchChannel('prev');
+                if (e.key === 'ArrowDown') switchChannel('next');
             }
         });
 
         function play(url) {
             currentUrl = url;
+            localStorage.setItem('last_tv_url', url); // লাস্ট ওয়াচড সেভ
             loader.style.display = 'block';
+            
             if (Hls.isSupported()) {
                 const hls = new Hls();
                 hls.loadSource(url);
@@ -204,6 +224,7 @@
         function filter(cat, btn) {
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
+            document.getElementById('searchInput').value = ""; // ফিল্টার করলে সার্চ রিসেট
             filteredChannels = (cat === 'All') ? channels : 
                                (cat === 'Favorite') ? channels.filter(c => favorites.includes(c.url)) :
                                channels.filter(c => c.group.toLowerCase().includes(cat.toLowerCase()));
