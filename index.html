@@ -17,104 +17,108 @@
         body, html {
             margin: 0; padding: 0; background: var(--bg);
             color: var(--text); font-family: 'Poppins', sans-serif;
-            height: 100vh; overflow: hidden;
+            height: 100vh;
+            /* নিচের লাইনটি মোবাইলে 'pull-to-refresh' এলাউ করবে */
+            overscroll-behavior-y: contain; 
+            overflow: hidden; 
         }
 
         /* মেইন লেআউট */
         .app-wrapper {
             display: flex; height: 100vh; width: 100vw;
-            flex-direction: row; /* টিভির জন্য ডিফল্ট সাইডবার */
+            flex-direction: row;
         }
 
-        /* ভিডিও প্লেয়ার (ফিক্সড ওপরের অংশে) */
+        /* ভিডিও প্লেয়ার */
         .player-section {
             flex: 1; display: flex; flex-direction: column; background: #000;
         }
         .video-container {
-            width: 100%; height: 50vh; background: #000; position: relative;
+            width: 100%; height: 45vh; background: #000; position: relative;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
         }
         video { width: 100%; height: 100%; object-fit: contain; }
 
-        /* সার্চ ও ক্যাটাগরি প্যানেল */
+        /* কন্ট্রোলস */
         .header-controls {
-            padding: 15px 20px; display: flex; justify-content: space-between;
-            align-items: center; background: linear-gradient(to bottom, #111, transparent);
+            padding: 10px 20px; display: flex; justify-content: space-between;
+            align-items: center; background: #0a0a0a;
         }
         .search-bar {
-            background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
-            padding: 10px 20px; border-radius: 20px; color: #fff; width: 40%; outline: none;
+            background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1);
+            padding: 8px 15px; border-radius: 10px; color: #fff; width: 45%; outline: none;
         }
         .search-bar:focus { border-color: var(--primary); }
 
         /* চ্যানেল গ্রিড */
         .content-grid {
-            flex: 1; padding: 10px 20px; overflow-y: auto;
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            flex: 1; padding: 15px; 
+            overflow-y: auto; /* মোবাইলে স্ক্রল করার জন্য */
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
             gap: 15px; padding-bottom: 100px;
+            -webkit-overflow-scrolling: touch; /* আইফোনের জন্য স্মুথ স্ক্রল */
         }
 
         /* কার্ড ডিজাইন */
         .channel-card {
-            background: var(--card-bg); border-radius: 15px; padding: 15px;
-            text-align: center; border: 2px solid transparent; transition: 0.3s;
+            background: var(--card-bg); border-radius: 12px; padding: 12px;
+            text-align: center; border: 2px solid transparent; transition: 0.2s;
             outline: none; cursor: pointer;
         }
         .channel-card:focus, .channel-card:hover {
-            transform: scale(1.08); border-color: var(--primary); background: #1a1a1a;
-            box-shadow: 0 10px 20px rgba(255, 0, 64, 0.3);
+            transform: scale(1.05); border-color: var(--primary); background: #1a1a1a;
         }
-        .channel-card img { width: 70px; height: 70px; object-fit: contain; margin-bottom: 8px; }
-        .channel-card .name { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .channel-card img { width: 60px; height: 60px; object-fit: contain; border-radius: 8px; }
+        .channel-card .name { font-size: 12px; margin-top: 8px; font-weight: 500; }
 
-        /* সাইডবার (শুধুমাত্র টিভি/ডেস্কটপ) */
+        /* সাইডবার (টিভি) */
         .sidebar {
-            width: 80px; background: #000; display: flex; flex-direction: column;
-            align-items: center; padding-top: 30px; gap: 25px;
-            border-right: 1px solid #222;
+            width: 70px; background: #000; display: flex; flex-direction: column;
+            align-items: center; padding-top: 20px; gap: 20px;
+            border-right: 1px solid #1a1a1a;
         }
         .nav-btn {
-            background: none; border: none; color: #666; font-size: 20px;
+            background: none; border: none; color: #555; font-size: 22px;
             cursor: pointer; outline: none; transition: 0.3s;
         }
-        .nav-btn:focus, .nav-btn.active { color: var(--primary); transform: scale(1.2); }
+        .nav-btn.active, .nav-btn:focus { color: var(--primary); transform: scale(1.1); }
 
-        /* মোবাইল রেসপন্সিভ ডিজাইন */
+        /* মোবাইল এডজাস্টমেন্ট */
         @media (max-width: 768px) {
             .app-wrapper { flex-direction: column; }
             .sidebar {
-                width: 100%; height: 60px; flex-direction: row;
+                width: 100%; height: 65px; flex-direction: row;
                 order: 3; justify-content: space-around; padding: 0;
-                border-right: none; border-top: 1px solid #222;
+                border-right: none; border-top: 1px solid #1a1a1a;
             }
             .video-container { height: 30vh; }
-            .search-bar { width: 60%; }
-            .content-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
-            .channel-card img { width: 50px; height: 50px; }
+            .content-grid { 
+                grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); 
+                /* মোবাইলে টান দিলে রিফ্রেশ পেতে এটি জরুরি */
+                overflow-y: scroll; 
+            }
+            .header-controls h3 { font-size: 14px; }
         }
-
-        /* কাস্টম স্ক্রলবার */
-        .content-grid::-webkit-scrollbar { width: 5px; }
-        .content-grid::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
     </style>
 </head>
 <body>
 
     <div class="app-wrapper">
         <nav class="sidebar">
-            <button class="nav-btn active" onclick="filterData('All')" tabindex="1">🏠</button>
-            <button class="nav-btn" onclick="filterData('বাংলা')" tabindex="1">🇧🇩</button>
-            <button class="nav-btn" onclick="filterData('হিন্দি')" tabindex="1">🇮🇳</button>
-            <button class="nav-btn" onclick="filterData('Sports')" tabindex="1">⚽</button>
+            <button class="nav-btn active" onclick="filterData('All', this)">🏠</button>
+            <button class="nav-btn" onclick="filterData('বাংলা', this)">🇧🇩</button>
+            <button class="nav-btn" onclick="filterData('হিন্দি', this)">🇮🇳</button>
+            <button class="nav-btn" onclick="filterData('Sports', this)">⚽</button>
         </nav>
 
         <main class="player-section">
             <div class="video-container">
-                <video id="tv-player" controls poster="https://via.placeholder.com/1280x720/000/fff?text=Elite+TV+Pro"></video>
+                <video id="tv-player" controls poster="https://via.placeholder.com/1280x720/000/fff?text=Live+TV+Pro"></video>
             </div>
 
             <div class="header-controls">
-                <h3 id="cat-title" style="margin:0; font-size: 18px;">All Channels</h3>
-                <input type="text" id="search" class="search-bar" placeholder="খুঁজুন..." oninput="searchCh()" tabindex="1">
+                <h3 id="cat-title" style="margin:0;">All Channels</h3>
+                <input type="text" id="search" class="search-bar" placeholder="Search..." oninput="searchCh()">
             </div>
 
             <div class="content-grid" id="grid">
@@ -127,14 +131,13 @@
         const video = document.getElementById('tv-player');
         let channels = [];
 
-        // ডাটা লোড করা
         async function load() {
             try {
                 const res = await fetch(m3uUrl);
                 const data = await res.text();
                 parse(data);
                 render(channels);
-            } catch (e) { console.error("Error loading channels"); }
+            } catch (e) { alert("Error loading channels!"); }
         }
 
         function parse(data) {
@@ -156,8 +159,8 @@
         function render(list) {
             const grid = document.getElementById('grid');
             grid.innerHTML = list.map(ch => `
-                <div class="channel-card" tabindex="2" onclick="play('${ch.url}')">
-                    <img src="${ch.logo}" onerror="this.src='https://via.placeholder.com/100/222/fff?text=TV'">
+                <div class="channel-card" tabindex="0" onclick="play('${ch.url}')">
+                    <img src="${ch.logo}" onerror="this.src='https://via.placeholder.com/80/222/fff?text=TV'">
                     <div class="name">${ch.name}</div>
                 </div>
             `).join('');
@@ -175,8 +178,10 @@
             }
         }
 
-        function filterData(cat) {
-            document.getElementById('cat-title').innerText = cat + " Channels";
+        function filterData(cat, btn) {
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById('cat-title').innerText = cat;
             const res = (cat === 'All') ? channels : channels.filter(c => 
                 c.group.toLowerCase().includes(cat.toLowerCase()) || 
                 c.name.toLowerCase().includes(cat.toLowerCase())
@@ -190,11 +195,9 @@
             render(res);
         }
 
-        // রিমোট কন্ট্রোল হ্যান্ডলিং
+        // টিভির রিমোট কন্ট্রোল
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') document.activeElement.click();
-            
-            // অটো স্ক্রলিং (টিভির জন্য)
             setTimeout(() => {
                 const active = document.activeElement;
                 if (active.classList.contains('channel-card')) {
