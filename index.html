@@ -3,143 +3,149 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>World Best Live TV Pro</title>
+    <title>Ultimate Android TV Pro</title>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <style>
-        :root { --main: #ff0040; --bg: #000; --fav: #ffc107; --card: #151515; }
-        body, html { margin: 0; padding: 0; background: var(--bg); color: #fff; font-family: 'Segoe UI', Roboto, sans-serif; overflow: hidden; height: 100%; }
+        :root { --accent: #ff0040; --bg: #030303; --card: #121212; --fav: #ffc107; }
+        body, html { margin: 0; padding: 0; background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; overflow: hidden; height: 100%; }
 
-        /* প্লেয়ার সেকশন - প্রিমিয়াম থিয়েটার লুক */
-        .video-section { width: 100%; height: 55vh; background: #000; position: relative; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 30px rgba(0,0,0,0.9); }
+        /* ১. প্রিমিয়াম ভিডিও সেকশন */
+        .player-container { width: 100%; height: 58vh; background: #000; position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden; }
         video { width: 100%; height: 100%; object-fit: contain; outline: none; }
 
-        /* কন্টেন্ট এরিয়া */
-        .content-area { height: 45vh; padding: 20px; overflow-y: auto; scroll-behavior: smooth; }
-        .section-header { font-size: 18px; margin: 15px 0 10px; color: #eee; font-weight: 600; display: flex; align-items: center; gap: 10px; }
-        .section-header i { color: var(--main); }
+        /* ২. স্মার্ট ইনফো প্যানেল (OSD) */
+        .osd-info { 
+            position: absolute; bottom: 20px; left: 20px; background: rgba(0,0,0,0.85); 
+            padding: 15px 30px; border-radius: 12px; display: none; border-left: 8px solid var(--accent);
+            z-index: 100; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
 
-        /* স্মার্ট গ্রিড - ল্যাগ ছাড়া স্ক্রলিং */
-        .channel-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 20px; padding-bottom: 30px; }
+        /* ৩. চ্যানেল কন্টেন্ট এরিয়া */
+        .content-section { height: 42vh; padding: 10px 20px; overflow-y: auto; scroll-behavior: smooth; }
+        .row-title { font-size: 22px; font-weight: bold; margin: 15px 0; color: #bbb; display: flex; align-items: center; gap: 10px; }
+        .row-title span { color: var(--accent); }
 
-        /* কার্ড ডিজাইন - বিশ্বের শ্রেষ্ঠ ফোকাস ইফেক্ট */
-        .channel-card { 
-            background: var(--card); border-radius: 18px; padding: 15px; text-align: center;
+        /* ৪. মাস্টার টিভি গ্রিড (ল্যাগ ফ্রি) */
+        .tv-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 25px; padding-bottom: 50px; }
+
+        /* ৫. চ্যানেল কার্ড - শ্রেষ্ঠ ফোকাস ডিজাইন */
+        .tv-card { 
+            background: var(--card); border-radius: 20px; padding: 18px; text-align: center;
             cursor: pointer; border: 3px solid transparent; outline: none; 
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            position: relative;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); position: relative;
         }
-        .channel-card:focus, .channel-card:hover { 
-            transform: scale(1.12); border-color: var(--main); 
-            background: #202020; box-shadow: 0 0 25px rgba(255, 0, 64, 0.5);
-            z-index: 10;
+        .tv-card:focus { 
+            transform: scale(1.15); border-color: var(--accent); 
+            background: #1e1e1e; box-shadow: 0 0 35px rgba(255, 0, 64, 0.6); z-index: 10;
         }
 
-        /* লোগো ডিজাইন */
-        .logo-box { width: 85px; height: 85px; background: #fff; border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 3px solid #333; }
-        .logo-box img { width: 75%; height: auto; object-fit: contain; }
+        .logo-wrapper { 
+            width: 90px; height: 90px; background: #fff; border-radius: 50%; 
+            margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; 
+            overflow: hidden; border: 4px solid #222; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .logo-wrapper img { width: 75%; height: auto; object-fit: contain; }
         
-        .fav-indicator { position: absolute; top: 10px; right: 10px; color: var(--fav); font-size: 20px; display: none; text-shadow: 0 0 5px #000; }
-        .is-fav .fav-indicator { display: block; }
-        .is-fav { border-color: rgba(255, 193, 7, 0.3); }
+        .fav-star { position: absolute; top: 10px; right: 10px; color: var(--fav); font-size: 22px; display: none; }
+        .is-fav .fav-star { display: block; }
 
-        .channel-name { font-size: 14px; font-weight: 500; color: #ddd; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-        /* স্ট্যাটাস নোটিফিকেশন */
-        #osd { position: absolute; top: 30px; left: 30px; background: rgba(0,0,0,0.85); padding: 12px 25px; border-radius: 12px; display: none; border-left: 6px solid var(--main); font-weight: bold; font-size: 18px; z-index: 100; animation: slideIn 0.3s; }
-        @keyframes slideIn { from { transform: translateX(-50px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-
-        /* স্ক্রলবার হাইড */
-        .content-area::-webkit-scrollbar { display: none; }
+        .ch-name { font-size: 15px; font-weight: 600; color: #ddd; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        
+        /* স্ক্রলবার হাইড (টিভির জন্য) */
+        .content-section::-webkit-scrollbar { display: none; }
     </style>
 </head>
 <body>
 
-    <div class="video-section">
-        <div id="osd"></div>
-        <video id="tv-player" autoplay controls poster="https://via.placeholder.com/1920x1080?text=Live+TV+Pro"></video>
+    <div class="player-container">
+        <div id="osd-box" class="osd-info"></div>
+        <video id="tv-main-player" autoplay controls poster="https://via.placeholder.com/1920x1080?text=Live+TV+Pro"></video>
     </div>
 
-    <div class="content-area">
-        <div id="fav-container" style="display: none;">
-            <div class="section-header">⭐ পছন্দের চ্যানেল</div>
-            <div class="channel-grid" id="fav-grid"></div>
+    <div class="content-section">
+        <div id="fav-row" style="display: none;">
+            <div class="row-title"><span>★</span> আপনার পছন্দের চ্যানেলসমূহ</div>
+            <div class="tv-grid" id="fav-grid"></div>
         </div>
         
-        <div class="section-header">📺 সকল চ্যানেল</div>
-        <div class="channel-grid" id="all-grid">
-            <div style="padding: 20px;">সিস্টেম আপডেট হচ্ছে...</div>
+        <div class="row-title"><span>▶</span> সকল চ্যানেল লাইভ</div>
+        <div class="tv-grid" id="main-grid">
+            <div style="padding: 20px;">সিস্টেম অপ্টিমাইজ হচ্ছে...</div>
         </div>
     </div>
 
     <script>
-        const m3uUrl = 'https://raw.githubusercontent.com/soheltanver85-a11y/Live-tv2/refs/heads/main/Live-tv2';
-        const video = document.getElementById('tv-player');
+        const m3u = 'https://raw.githubusercontent.com/soheltanver85-a11y/Live-tv2/refs/heads/main/Live-tv2';
+        const video = document.getElementById('tv-main-player');
         let channels = [];
-        let favorites = JSON.parse(localStorage.getItem('my_favs')) || [];
+        let favorites = JSON.parse(localStorage.getItem('tv_pro_favs')) || [];
         let currentIndex = 0;
         let pressTimer;
 
-        // স্ট্রিমিং ইঞ্জিন (সুপার ফাস্ট)
-        function playSource(url) {
+        // শ্রেষ্ঠ স্ট্রিমিং ইঞ্জিন (No Lag)
+        function playStream(url) {
             if (Hls.isSupported()) {
-                const hls = new Hls({ capLevelToPlayerSize: true, lowLatencyMode: true });
+                const hls = new Hls({ 
+                    capLevelToPlayerSize: true, 
+                    autoStartLoad: true,
+                    enableWorker: true // পারফরম্যান্স বাড়াতে
+                });
                 hls.loadSource(url); hls.attachMedia(video);
             } else { video.src = url; }
-            video.play().catch(e => console.log("Autoplay blocked"));
+            video.play().catch(() => {});
         }
 
-        async function startApp() {
+        async function launch() {
             try {
-                const res = await fetch(m3uUrl);
-                const data = await res.text();
-                const lines = data.split('\n');
-                let n = '', l = '';
+                const res = await fetch(m3u);
+                const text = await res.text();
+                const lines = text.split('\n');
+                let name = '', logo = '';
                 
                 lines.forEach(line => {
                     if (line.startsWith('#EXTINF')) {
-                        n = (line.split(',')[1] || 'Unknown').trim();
-                        l = (line.match(/tvg-logo="(.*?)"/) || ["",""])[1];
+                        name = (line.split(',')[1] || 'Unknown Channel').trim();
+                        logo = (line.match(/tvg-logo="(.*?)"/) || ["",""])[1];
                     } else if (line.startsWith('http')) {
-                        channels.push({ name: n, logo: l, url: line.trim() });
+                        channels.push({ name, logo, url: line.trim() });
                     }
                 });
-                refreshUI();
-                if(channels.length > 0) selectChannel(0);
-            } catch (e) { showOSD("ইন্টারনেট কানেকশন চেক করুন!"); }
+                updateInterface();
+                if(channels.length > 0) switchChannel(0);
+            } catch (e) { showOSD("নেটওয়ার্ক সমস্যা!"); }
         }
 
-        function refreshUI() {
-            renderList(channels, 'all-grid');
-            const favBox = document.getElementById('fav-container');
+        function updateInterface() {
+            renderGrid(channels, 'main-grid');
+            const favSec = document.getElementById('fav-row');
             if (favorites.length > 0) {
-                favBox.style.display = 'block';
-                renderList(favorites, 'fav-grid');
-            } else { favBox.style.display = 'none'; }
+                favSec.style.display = 'block';
+                renderGrid(favorites, 'fav-grid');
+            } else { favSec.style.display = 'none'; }
         }
 
-        function renderList(list, id) {
-            const container = document.getElementById(id);
-            container.innerHTML = list.map((ch, i) => {
+        function renderGrid(list, id) {
+            const grid = document.getElementById(id);
+            grid.innerHTML = list.map((ch, i) => {
                 const isFav = favorites.some(f => f.url === ch.url);
                 return `
-                <div class="channel-card ${isFav ? 'is-fav' : ''}" tabindex="0" 
-                     onclick="playFromGrid('${ch.url}')" 
-                     oncontextmenu="event.preventDefault(); toggleFavorite('${ch.url}')"
+                <div class="tv-card ${isFav ? 'is-fav' : ''}" tabindex="0" 
+                     onclick="playFromUI('${ch.url}')" 
                      onmousedown="holdStart('${ch.url}')" onmouseup="holdEnd()"
                      ontouchstart="holdStart('${ch.url}')" ontouchend="holdEnd()">
-                    <span class="fav-indicator">⭐</span>
-                    <div class="logo-box">
+                    <span class="fav-star">★</span>
+                    <div class="logo-wrapper">
                         <img src="${ch.logo}" onerror="this.src='https://via.placeholder.com/100?text=TV'">
                     </div>
-                    <div class="channel-name">${ch.name}</div>
+                    <div class="ch-name">${ch.name}</div>
                 </div>`;
             }).join('');
         }
 
-        function holdStart(url) { pressTimer = setTimeout(() => toggleFavorite(url), 1200); }
+        function holdStart(url) { pressTimer = setTimeout(() => handleFav(url), 1200); }
         function holdEnd() { clearTimeout(pressTimer); }
 
-        function toggleFavorite(url) {
+        function handleFav(url) {
             const ch = channels.find(c => c.url === url);
             const idx = favorites.findIndex(f => f.url === url);
             if (idx > -1) {
@@ -147,52 +153,52 @@
                 showOSD("ফেভারিট থেকে সরানো হয়েছে");
             } else {
                 favorites.push(ch);
-                showOSD("ফেভারিটে যোগ করা হয়েছে ⭐");
+                showOSD("ফেভারিটে যোগ হয়েছে ⭐");
             }
-            localStorage.setItem('my_favs', JSON.stringify(favorites));
-            refreshUI();
+            localStorage.setItem('tv_pro_favs', JSON.stringify(favorites));
+            updateInterface();
         }
 
-        function playFromGrid(url) {
+        function playFromUI(url) {
             const idx = channels.findIndex(c => c.url === url);
-            if (idx > -1) selectChannel(idx);
+            if (idx > -1) switchChannel(idx);
         }
 
-        function selectChannel(i) {
+        function switchChannel(i) {
             if(i < 0) i = channels.length - 1;
             if(i >= channels.length) i = 0;
             currentIndex = i;
-            playSource(channels[i].url);
-            showOSD("📺 " + channels[i].name);
+            playStream(channels[i].url);
+            showOSD("📺 চ্যানেল: " + channels[i].name);
         }
 
         function showOSD(txt) {
-            const el = document.getElementById('osd');
-            el.innerText = txt; el.style.display = 'block';
-            clearTimeout(window.hideOSD);
-            window.hideOSD = setTimeout(() => el.style.display = 'none', 3500);
+            const osd = document.getElementById('osd-box');
+            osd.innerText = txt; osd.style.display = 'block';
+            clearTimeout(window.hOSD);
+            window.hOSD = setTimeout(() => osd.style.display = 'none', 4000);
         }
 
-        // রিমোট কন্ট্রোল মাস্টার সেটিংস
+        // রিমোট কন্ট্রোল মাস্টার হ্যান্ডলার
         document.addEventListener('keydown', (e) => {
             switch(e.keyCode) {
-                case 39: selectChannel(currentIndex + 1); break; // Right
-                case 37: selectChannel(currentIndex - 1); break; // Left
-                case 38: // Up (Vol)
+                case 39: switchChannel(currentIndex + 1); break; // Right
+                case 37: switchChannel(currentIndex - 1); break; // Left
+                case 38: // Up (Vol+)
                     video.volume = Math.min(video.volume + 0.1, 1);
                     showOSD("🔊 ভলিউম: " + Math.round(video.volume * 100) + "%");
                     break;
-                case 40: // Down (Vol)
+                case 40: // Down (Vol-)
                     video.volume = Math.max(video.volume - 0.1, 0);
                     showOSD("🔉 ভলিউম: " + Math.round(video.volume * 100) + "%");
                     break;
-                case 13: // OK
+                case 13: // OK Button
                     video.paused ? video.play() : video.pause();
                     break;
             }
         });
 
-        startApp();
+        launch();
     </script>
 </body>
 </html>
