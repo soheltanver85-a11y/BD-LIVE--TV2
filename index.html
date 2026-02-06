@@ -4,123 +4,362 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Universal TV Pro</title>
+
+<!-- FONT -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- HLS.js -->
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 
 <style>
-:root{--p:#e50914;--b:#0a0a0a;--c:#1a1a1a}
-body,html{margin:0;height:100%;background:var(--b);color:#fff;font-family:Segoe UI;overflow:hidden}
+:root{
+--primary:#ff2a2a;
+--bg:#050505;
+--card:#121212;
+--glass:rgba(255,255,255,.06);
+--glow:0 0 20px rgba(255,42,42,.6);
+}
+
+*{
+-webkit-font-smoothing:antialiased;
+text-rendering:optimizeLegibility;
+}
+
+html,body{
+margin:0;
+height:100%;
+background:radial-gradient(circle at top,#111,#000 60%);
+color:#fff;
+font-family:'Inter',system-ui;
+overflow:hidden;
+}
+
 .app{display:flex;height:100vh}
-.sidebar{width:80px;background:#000;display:flex;flex-direction:column;align-items:center;gap:20px;padding-top:20px}
-.btn{background:#222;color:#aaa;border:none;padding:8px 14px;border-radius:6px;font-size:16px}
-.btn.active{background:var(--p);color:#fff}
+
+/* Sidebar */
+.sidebar{
+width:80px;
+background:#000;
+display:flex;
+flex-direction:column;
+align-items:center;
+gap:20px;
+padding-top:20px;
+border-right:1px solid #111;
+}
+.nav-btn{
+background:var(--glass);
+border:none;
+border-radius:999px;
+padding:10px 14px;
+font-size:16px;
+color:#ccc;
+cursor:pointer;
+}
+.nav-btn.active{
+background:var(--primary);
+color:#fff;
+box-shadow:var(--glow);
+}
+
+/* Main layout */
 .main{flex:1;display:flex;flex-direction:column}
-.video{height:45vh;background:#000;position:relative}
-video{width:100%;height:100%;object-fit:contain}
-#loader{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-width:40px;height:40px;border:4px solid #eee;border-top:4px solid var(--p);
-border-radius:50%;animation:spin 1s linear infinite;display:none}
-@keyframes spin{100%{transform:translate(-50%,-50%) rotate(360deg)}}
-#now{position:absolute;bottom:10px;left:10px;background:rgba(0,0,0,.6);
-padding:8px 12px;border-radius:6px;font-weight:bold}
-.top{padding:10px;border-bottom:1px solid #222}
-.search{width:95%;padding:10px;font-size:16px;background:#222;color:#fff;border-radius:8px;border:none}
-.grid{flex:1;overflow-y:auto;display:grid;gap:15px;padding:15px;
-grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}
-.card{background:var(--c);border-radius:10px;padding:12px;text-align:center;
-border:4px solid transparent;cursor:pointer;outline:none}
-.card:focus{border-color:#fff;box-shadow:0 0 15px var(--p);transform:scale(1.08)}
-.card img{width:60px;height:60px;object-fit:contain}
-.card span{font-size:14px;font-weight:bold;white-space:nowrap;overflow:hidden}
+
+/* Video box */
+.video-box{
+height:50vh;
+background:#000;
+position:relative;
+border-bottom:1px solid rgba(255,255,255,.08);
+}
+video{
+width:100%;
+height:100%;
+object-fit:contain;
+background:#000;
+}
+#loader{
+position:absolute;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+width:40px;
+height:40px;
+border:4px solid #eee;
+border-top:4px solid var(--primary);
+border-radius:50%;
+animation:spin 1s linear infinite;
+display:none;
+z-index:10;
+}
+@keyframes spin{
+100%{transform:translate(-50%,-50%) rotate(360deg)}
+}
+#now{
+position:absolute;
+bottom:12px;
+left:12px;
+background:rgba(0,0,0,.6);
+padding:8px 14px;
+border-radius:8px;
+font-weight:700;
+font-size:18px;
+}
+
+/* Top search + category */
+.top{
+padding:12px;
+border-bottom:1px solid #111;
+display:flex;
+flex-direction:column;
+gap:10px;
+}
+.search{
+width:95%;
+padding:12px;
+font-size:17px;
+background:#1a1a1a;
+color:#fff;
+border:none;
+border-radius:10px;
+outline:none;
+}
+
+/* Category bar */
+.cat-bar{
+display:flex;
+gap:10px;
+overflow-x:auto;
+white-space:nowrap;
+padding:0 5px;
+}
+.cat-bar::-webkit-scrollbar{display:none;}
+.cat-btn{
+padding:8px 16px;
+border-radius:999px;
+background:var(--glass);
+border:none;
+color:#ccc;
+cursor:pointer;
+flex-shrink:0;
+transition:.25s;
+}
+.cat-btn.active{
+background:var(--primary);
+color:#fff;
+box-shadow:var(--glow);
+}
+
+/* Grid of channels */
+.grid{
+flex:1;
+overflow-y:auto;
+display:grid;
+gap:22px;
+padding:18px;
+grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
+}
+
+.card{
+background:linear-gradient(180deg,#181818,#0c0c0c);
+border-radius:18px;
+padding:16px;
+text-align:center;
+cursor:pointer;
+border:3px solid transparent;
+transition:.25s cubic-bezier(.4,0,.2,1);
+outline:none;
+position:relative;
+}
+.card img{
+width:70px;
+height:70px;
+margin-bottom:10px;
+filter:drop-shadow(0 0 6px rgba(255,255,255,.25));
+}
+.card span{
+font-size:15px;
+font-weight:600;
+white-space:nowrap;
+overflow:hidden;
+text-overflow:ellipsis;
+}
+/* Focus */
+.card:focus{
+transform:scale(1.15);
+border-color:var(--primary);
+box-shadow:var(--glow);
+z-index:10;
+}
+/* Favorite star */
+.card .fav{
+position:absolute;
+top:8px;
+right:8px;
+font-size:18px;
+color:#ff0;
+display:none;
+}
+.card.is-fav .fav{display:block;}
 </style>
 </head>
 
 <body>
+
 <div class="app">
 
+<!-- Sidebar -->
 <nav class="sidebar">
-<button class="btn active">🏠</button>
+<button class="nav-btn active" onclick="filterCategory('All',this)">🏠</button>
+<button class="nav-btn" onclick="filterCategory('Favorite',this)">⭐</button>
 </nav>
 
 <div class="main">
 
-<div class="video" id="vbox" onclick="fs()">
+<!-- Video -->
+<div class="video-box" id="vbox" onclick="toggleFS()">
 <div id="loader"></div>
 <div id="now"></div>
 <video id="player" autoplay playsinline webkit-playsinline></video>
 </div>
 
+<!-- Search + Category -->
 <div class="top">
-<input class="search" placeholder="চ্যানেল খুঁজুন" oninput="search(this.value)">
+<input class="search" placeholder="চ্যানেল খুঁজুন..." oninput="search(this.value)">
+<div class="cat-bar" id="catBar">
+<button class="cat-btn active" onclick="filterCategory('All',this)">All</button>
+<button class="cat-btn" onclick="filterCategory('Favorite',this)">Favorite</button>
+<button class="cat-btn" onclick="filterCategory('বাংলা',this)">বাংলা</button>
+<button class="cat-btn" onclick="filterCategory('Sports',this)">Sports</button>
+</div>
 </div>
 
+<!-- Channel grid -->
 <div class="grid" id="grid"></div>
 
 </div>
 </div>
 
 <script>
-const M3U = "https://raw.githubusercontent.com/soheltanver85-a11y/Live-tv2/main/Live-tv2";
+// ====== Config ======
+const M3U="https://raw.githubusercontent.com/soheltanver85-a11y/Live-tv2/main/Live-tv2";
 const video=document.getElementById("player");
 const grid=document.getElementById("grid");
 const loader=document.getElementById("loader");
 const now=document.getElementById("now");
 
-let channels=[],filtered=[],current="",hls;
+let channels=[],filtered=[],current="",hls,favorites=JSON.parse(localStorage.getItem("tv_favs"))||[];
 
-fetch(M3U).then(r=>r.text()).then(parse).catch(()=>alert("M3U লোড হয়নি"));
+// ====== Init ======
+fetch(M3U).then(r=>r.text()).then(parse);
 
-function parse(t){
-let l=t.split("\n"),o={};
-l.forEach(x=>{
-if(x.startsWith("#EXTINF")){
-o.name=x.split(",")[1]||"TV";
-o.logo=x.match(/tvg-logo="(.*?)"/)?.[1]||"";
-}
-else if(x.startsWith("http")){
-o.url=x.trim();
-channels.push({...o});
-o={};
+function parse(data){
+let lines=data.split("\n"),item={};
+lines.forEach(l=>{
+if(l.startsWith("#EXTINF")){
+item.name=l.split(",")[1]||"TV";
+item.logo=l.match(/tvg-logo="(.*?)"/)?.[1]||"";
+item.group=l.match(/group-title="(.*?)"/)?.[1]||"All";
+}else if(l.startsWith("http")){
+item.url=l.trim();
+channels.push({...item});
+item={};
 }
 });
 filtered=[...channels];
 render(filtered);
+
+let last=localStorage.getItem("last_tv");
+if(last) play(last);
 }
 
+// ====== Render Channels ======
 function render(list){
 grid.innerHTML=list.map(c=>`
-<div class="card" tabindex="0" onclick="play('${c.url}')">
+<div class="card ${favorites.includes(c.url)?'is-fav':''}" tabindex="0" onclick="play('${c.url}')"
+oncontextmenu="toggleFav(event,'${c.url}')">
 <img src="${c.logo||'https://via.placeholder.com/100'}">
 <span>${c.name}</span>
+<div class="fav">⭐</div>
 </div>`).join("");
 }
 
+// ====== Play Channel ======
 function play(url){
 current=url;
+localStorage.setItem("last_tv",url);
 loader.style.display="block";
-let c=channels.find(x=>x.url===url);
-now.innerText=c?.name||"";
+
+let ch=channels.find(x=>x.url===url);
+now.innerText=ch?.name||"";
 
 if(hls) hls.destroy();
 if(Hls.isSupported()){
-hls=new Hls();
+hls=new Hls({lowLatencyMode:true});
 hls.loadSource(url);
 hls.attachMedia(video);
 hls.on(Hls.Events.MANIFEST_PARSED,()=>video.play());
-}
-else{video.src=url;video.play()}
-video.onplaying=()=>loader.style.display="none";
+hls.on(Hls.Events.ERROR,(e,d)=>{if(d.fatal) next();});
+}else{
+video.src=url; video.play();
 }
 
+video.onplaying=()=>loader.style.display="none";
+setTimeout(()=>{if(video.readyState<3) next();},7000);
+}
+
+// ====== Next Channel ======
+function next(){
+let i=filtered.findIndex(c=>c.url===current);
+i=(i+1)%filtered.length;
+play(filtered[i].url);
+}
+
+// ====== Search ======
 function search(q){
 filtered=channels.filter(c=>c.name.toLowerCase().includes(q.toLowerCase()));
 render(filtered);
 }
 
-function fs(){
+// ====== Category Filter ======
+function filterCategory(cat,btn){
+document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));
+btn.classList.add('active');
+document.querySelector('.search').value="";
+filtered = (cat==='All') ? channels :
+           (cat==='Favorite') ? channels.filter(c=>favorites.includes(c.url)) :
+           channels.filter(c=>c.group.toLowerCase().includes(cat.toLowerCase()));
+render(filtered);
+}
+
+// ====== Favorite Toggle ======
+function toggleFav(e,url){
+e.preventDefault();
+if(favorites.includes(url)){
+favorites=favorites.filter(x=>x!==url);
+}else{favorites.push(url);}
+localStorage.setItem("tv_favs",JSON.stringify(favorites));
+render(filtered);
+}
+
+// ====== Fullscreen ======
+function toggleFS(){
 !document.fullscreenElement?
 document.getElementById("vbox").requestFullscreen():
 document.exitFullscreen();
 }
+
+// ====== Remote Keys ======
+window.addEventListener("keydown",e=>{
+if(e.key==="ArrowUp") next();
+if(e.key==="ArrowDown") next();
+if(e.key==="Enter"){
+let active=document.activeElement;
+if(active.classList.contains("card")) play(active.dataset?.url||current);
+if(active.id==="vbox") toggleFS();
+}
+});
 </script>
+
 </body>
 </html>
