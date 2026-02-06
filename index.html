@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Universal TV Modern - Mobile & TV</title>
+<title>Universal TV - Netflix/Tubi Style</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 <style>
@@ -14,97 +14,76 @@
 --glass:rgba(255,255,255,.06);
 --glow:0 0 20px rgba(255,42,42,.6);
 --focus:#fff;
+--text:#fff;
 }
 
 /* GENERAL */
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif;}
-body,html{background:radial-gradient(circle at top,#111,#000 60%);color:#fff;overflow:hidden;height:100%;font-size:16px;}
-.app{display:flex;height:100vh;}
-
-/* SIDEBAR */
-.sidebar{width:80px;background:#000;display:flex;flex-direction:column;align-items:center;gap:20px;padding-top:20px;border-right:1px solid #222;}
-.nav-btn{background:var(--glass);border:none;border-radius:999px;padding:12px 16px;font-size:20px;color:#ccc;cursor:pointer;transition:.3s;}
-.nav-btn.active{background:var(--primary);color:#fff;box-shadow:var(--glow);}
-
-/* MAIN */
-.main{flex:1;display:flex;flex-direction:column;}
+body,html{background:radial-gradient(circle at top,#111,#000 60%);color:var(--text);overflow-x:hidden;overflow-y:hidden;height:100%;font-size:16px;}
+.app{display:flex;flex-direction:column;height:100vh;}
 
 /* VIDEO */
-.video-box{height:45vh;background:#000;position:relative;border-bottom:1px solid rgba(255,255,255,.08);}
-video{width:100%;height:100%;object-fit:contain;background:#000;border-radius:8px;}
+.video-box{height:35vh;background:#000;position:relative;margin-bottom:10px;}
+video{width:100%;height:100%;object-fit:contain;border-radius:8px;}
 #loader{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:50px;height:50px;border:5px solid #eee;border-top:5px solid var(--primary);border-radius:50%;animation:spin 1s linear infinite;display:none;z-index:10;}
 @keyframes spin{100%{transform:translate(-50%,-50%) rotate(360deg)}}
-#now{position:absolute;bottom:14px;left:14px;background:rgba(0,0,0,.6);padding:10px 16px;border-radius:10px;font-weight:700;font-size:20px;}
+#now{position:absolute;bottom:14px;left:14px;background:rgba(0,0,0,.6);padding:8px 12px;border-radius:10px;font-weight:700;font-size:18px;}
 
-/* TOP SEARCH + CATEGORY */
-.top{padding:12px;border-bottom:1px solid #222;display:flex;flex-direction:column;gap:10px;}
-.search{width:95%;padding:12px;font-size:16px;background:#222;color:#fff;border:none;border-radius:12px;outline:none;}
-.cat-bar{display:flex;gap:10px;overflow-x:auto;white-space:nowrap;padding:0 5px;}
-.cat-bar::-webkit-scrollbar{display:none;}
-.cat-btn{padding:8px 16px;border-radius:999px;background:var(--glass);border:none;color:#ccc;cursor:pointer;flex-shrink:0;font-size:14px;transition:.25s;}
-.cat-btn.active{background:var(--primary);color:#fff;box-shadow:var(--glow);}
+/* SEARCH BAR */
+.search-bar{padding:8px 12px;display:flex;gap:10px;align-items:center;}
+.search-bar input{flex:1;padding:10px;border-radius:12px;border:none;background:#222;color:#fff;font-size:16px;outline:none;}
 
-/* GRID */
-.grid{flex:1;overflow-y:auto;display:grid;gap:15px;padding:15px;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));scroll-behavior:smooth;transition:0.3s;}
-.card{background:linear-gradient(180deg,#202020,#111);border-radius:16px;padding:12px;text-align:center;cursor:pointer;border:2px solid transparent;transition:.25s;position:relative;}
-.card img{width:70px;height:70px;margin-bottom:8px;object-fit:contain;border-radius:8px;}
-.card span{font-size:14px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.card:focus{transform:scale(1.1);border-color:var(--primary);box-shadow:var(--glow);z-index:10;}
+/* CATEGORY ROWS */
+.category-row{margin:10px 0;display:flex;flex-direction:column;gap:6px;}
+.category-row h2{margin-left:12px;font-size:18px;font-weight:700;}
+.row-scroll{display:flex;overflow-x:auto;gap:12px;padding:0 12px;}
+.row-scroll::-webkit-scrollbar{display:none;}
+.card{min-width:120px;background:linear-gradient(180deg,#202020,#111);border-radius:12px;padding:8px;text-align:center;position:relative;cursor:pointer;transition:0.25s;}
+.card img{width:100%;height:80px;object-fit:contain;border-radius:8px;margin-bottom:6px;}
+.card span{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.card:focus{transform:scale(1.1);box-shadow:0 0 15px var(--primary);border:2px solid var(--primary);z-index:10;}
 .card .fav{position:absolute;top:6px;right:6px;font-size:18px;color:#ff0;display:none;}
 .card.is-fav .fav{display:block;}
 
-/* MOBILE RESPONSIVE */
+/* MOBILE ADJUST */
 @media(max-width:768px){
-.video-box{height:35vh;}
-.card img{width:60px;height:60px;}
+.video-box{height:28vh;}
+.card img{height:60px;}
 .card span{font-size:13px;}
-.cat-btn{font-size:12px;padding:6px 12px;}
-.search{font-size:14px;padding:8px;}
+.category-row h2{font-size:16px;}
+.search-bar input{font-size:14px;padding:8px;}
 #now{font-size:14px;padding:4px 8px;}
-.grid{gap:12px;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));padding:10px;}
-#loader{width:30px;height:30px;border-width:3px;border-top-width:3px;}
 }
 </style>
 </head>
 <body>
 
 <div class="app">
-<!-- Sidebar -->
-<nav class="sidebar">
-<button class="nav-btn active" onclick="filterCategory('All',this)">🏠</button>
-<button class="nav-btn" onclick="filterCategory('Favorite',this)">⭐</button>
-</nav>
-
-<!-- Main Content -->
-<div class="main">
+<!-- VIDEO -->
 <div class="video-box" id="vbox" onclick="toggleFS()">
 <div id="loader"></div>
 <div id="now"></div>
 <video id="player" autoplay playsinline webkit-playsinline></video>
 </div>
 
-<div class="top">
-<input class="search" placeholder="চ্যানেল খুঁজুন..." oninput="search(this.value)">
-<div class="cat-bar" id="catBar">
-<button class="cat-btn active" onclick="filterCategory('All',this)">All</button>
-<button class="cat-btn" onclick="filterCategory('Favorite',this)">Favorite</button>
-<button class="cat-btn" onclick="filterCategory('বাংলা',this)">বাংলা</button>
-<button class="cat-btn" onclick="filterCategory('Sports',this)">Sports</button>
-</div>
+<!-- SEARCH -->
+<div class="search-bar">
+<input type="text" id="searchInput" placeholder="চ্যানেল খুঁজুন..." oninput="search(this.value)">
 </div>
 
-<div class="grid" id="grid"></div>
-</div>
+<!-- CATEGORY CONTAINER -->
+<div id="categoriesContainer"></div>
+
 </div>
 
 <script>
 const M3U="https://raw.githubusercontent.com/soheltanver85-a11y/Live-tv2/main/Live-tv2";
 const video=document.getElementById("player");
-const grid=document.getElementById("grid");
 const loader=document.getElementById("loader");
 const now=document.getElementById("now");
+const categoriesContainer=document.getElementById("categoriesContainer");
 
-let channels=[],filtered=[],current="",hls,favorites=JSON.parse(localStorage.getItem("tv_favs"))||[];
+let channels=[],filtered=[],favorites=JSON.parse(localStorage.getItem("tv_favs"))||[],current="",hls;
 
 // INIT
 async function init(){
@@ -128,20 +107,35 @@ channels.push({...item});
 item={};
 }
 });
-filtered=[...channels];
-render(filtered);
+renderCategories();
 let last=localStorage.getItem("last_tv");
 if(last) play(last);
 }
 
-// RENDER
-function render(list){
-grid.innerHTML=list.map(c=>`
-<div class="card ${favorites.includes(c.url)?'is-fav':''}" tabindex="0" onclick="play('${c.url}')" oncontextmenu="toggleFav(event,'${c.url}')">
-<img src="${c.logo}">
-<span>${c.name}</span>
-<div class="fav">⭐</div>
-</div>`).join("");
+// RENDER CATEGORIES (Netflix/Tubi style)
+function renderCategories(){
+categoriesContainer.innerHTML="";
+let groups=[...new Set(channels.map(c=>c.group))];
+groups.forEach(g=>{
+let groupChannels=channels.filter(c=>c.group===g);
+let row=document.createElement("div");
+row.className="category-row";
+row.innerHTML=`<h2>${g}</h2>`;
+let scroll=document.createElement("div");
+scroll.className="row-scroll";
+groupChannels.forEach(c=>{
+let div=document.createElement("div");
+div.className="card "+(favorites.includes(c.url)?"is-fav":"");
+div.tabIndex=0;
+div.innerHTML=`<img src="${c.logo}"><span>${c.name}</span><div class="fav">⭐</div>`;
+div.onclick=()=>play(c.url);
+div.oncontextmenu=(e)=>{e.preventDefault();toggleFav(c.url);};
+scroll.appendChild(div);
+});
+row.appendChild(scroll);
+categoriesContainer.appendChild(row);
+});
+filtered=[...channels];
 }
 
 // PLAY
@@ -157,49 +151,25 @@ hls=new Hls({lowLatencyMode:true});
 hls.loadSource(url);
 hls.attachMedia(video);
 hls.on(Hls.Events.MANIFEST_PARSED,()=>video.play());
-hls.on(Hls.Events.ERROR,(e,d)=>{if(d.fatal) next();});
 }else{
 video.src=url; video.play();
 }
 video.onplaying=()=>loader.style.display="none";
-setTimeout(()=>{if(video.readyState<3) next();},7000);
-}
-
-// NEXT CHANNEL
-function next(){
-if(filtered.length===0) return;
-let i=filtered.findIndex(c=>c.url===current);
-i=(i+1)%filtered.length;
-play(filtered[i].url);
 }
 
 // SEARCH
 function search(q){
+channels.forEach(c=>c.element?.parentNode?.removeChild(c.element));
 filtered=channels.filter(c=>c.name.toLowerCase().includes(q.toLowerCase()));
-render(filtered);
-grid.scrollTop=0;
-}
-
-// CATEGORY
-function filterCategory(cat,btn){
-document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));
-btn.classList.add('active');
-document.querySelector('.search').value="";
-filtered = (cat==='All') ? channels :
-           (cat==='Favorite') ? channels.filter(c=>favorites.includes(c.url)) :
-           channels.filter(c=>c.group.toLowerCase().includes(cat.toLowerCase()));
-render(filtered);
-grid.scrollTop=0;
+renderCategories();
 }
 
 // FAVORITES
-function toggleFav(e,url){
-e.preventDefault();
-if(favorites.includes(url)){
-favorites=favorites.filter(x=>x!==url);
-}else{favorites.push(url);}
+function toggleFav(url){
+if(favorites.includes(url)) favorites=favorites.filter(x=>x!==url);
+else favorites.push(url);
 localStorage.setItem("tv_favs",JSON.stringify(favorites));
-render(filtered);
+renderCategories();
 }
 
 // FULLSCREEN
@@ -209,26 +179,16 @@ document.getElementById("vbox").requestFullscreen():
 document.exitFullscreen();
 }
 
-// REMOTE KEYS
-window.addEventListener("keydown",e=>{
-let active=document.activeElement;
-if(e.key==="ArrowUp") next();
-if(e.key==="ArrowDown") next();
-if(e.key==="Enter"){
-if(active.classList.contains("card")) active.click();
-if(active.id==="vbox") toggleFS();
-}
-});
-
-// PULL-DOWN REFRESH MOBILE (web compatible)
+// MOBILE PULL-DOWN REFRESH (simple)
 let touchStartY=0;
-grid.addEventListener('touchstart',e=>{touchStartY=e.touches[0].clientY;});
-grid.addEventListener('touchend',e=>{
+document.addEventListener('touchstart',e=>{touchStartY=e.touches[0].clientY;});
+document.addEventListener('touchend',e=>{
 let touchEndY=e.changedTouches[0].clientY;
-if(touchEndY - touchStartY > 50){ render(filtered); grid.scrollTop=0; } // pull down refresh
+if(touchEndY - touchStartY > 50){renderCategories();}
 });
 
 init();
 </script>
+
 </body>
 </html>
