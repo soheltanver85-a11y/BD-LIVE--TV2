@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Universal TV - Netflix/Tubi Style</title>
+<title>Universal TV - Ultimate Netflix Style</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 <style>
@@ -12,19 +12,17 @@
 --bg:#050505;
 --card:#1a1a1a;
 --glass:rgba(255,255,255,.06);
---glow:0 0 20px rgba(255,42,42,.6);
+--glow:0 0 25px rgba(255,42,42,.6);
 --focus:#fff;
 --text:#fff;
 }
-
-/* GENERAL */
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif;}
 body,html{background:radial-gradient(circle at top,#111,#000 60%);color:var(--text);overflow-x:hidden;overflow-y:hidden;height:100%;font-size:16px;}
 .app{display:flex;flex-direction:column;height:100vh;}
 
 /* VIDEO */
-.video-box{height:35vh;background:#000;position:relative;margin-bottom:10px;}
-video{width:100%;height:100%;object-fit:contain;border-radius:8px;}
+.video-box{height:35vh;background:#000;position:relative;margin-bottom:10px;border-radius:12px;overflow:hidden;}
+video{width:100%;height:100%;object-fit:contain;border-radius:12px;}
 #loader{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:50px;height:50px;border:5px solid #eee;border-top:5px solid var(--primary);border-radius:50%;animation:spin 1s linear infinite;display:none;z-index:10;}
 @keyframes spin{100%{transform:translate(-50%,-50%) rotate(360deg)}}
 #now{position:absolute;bottom:14px;left:14px;background:rgba(0,0,0,.6);padding:8px 12px;border-radius:10px;font-weight:700;font-size:18px;}
@@ -36,12 +34,12 @@ video{width:100%;height:100%;object-fit:contain;border-radius:8px;}
 /* CATEGORY ROWS */
 .category-row{margin:10px 0;display:flex;flex-direction:column;gap:6px;}
 .category-row h2{margin-left:12px;font-size:18px;font-weight:700;}
-.row-scroll{display:flex;overflow-x:auto;gap:12px;padding:0 12px;}
+.row-scroll{display:flex;overflow-x:auto;gap:12px;padding:0 12px;scroll-behavior:smooth;}
 .row-scroll::-webkit-scrollbar{display:none;}
-.card{min-width:120px;background:linear-gradient(180deg,#202020,#111);border-radius:12px;padding:8px;text-align:center;position:relative;cursor:pointer;transition:0.25s;}
+.card{min-width:120px;background:linear-gradient(180deg,#202020,#111);border-radius:12px;padding:8px;text-align:center;position:relative;cursor:pointer;transition:0.25s;flex-shrink:0;}
 .card img{width:100%;height:80px;object-fit:contain;border-radius:8px;margin-bottom:6px;}
 .card span{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.card:focus{transform:scale(1.1);box-shadow:0 0 15px var(--primary);border:2px solid var(--primary);z-index:10;}
+.card:focus, .card:hover{transform:scale(1.1);box-shadow:0 0 20px var(--primary);border:2px solid var(--primary);z-index:10;transition:0.25s;}
 .card .fav{position:absolute;top:6px;right:6px;font-size:18px;color:#ff0;display:none;}
 .card.is-fav .fav{display:block;}
 
@@ -59,21 +57,17 @@ video{width:100%;height:100%;object-fit:contain;border-radius:8px;}
 <body>
 
 <div class="app">
-<!-- VIDEO -->
 <div class="video-box" id="vbox" onclick="toggleFS()">
 <div id="loader"></div>
 <div id="now"></div>
 <video id="player" autoplay playsinline webkit-playsinline></video>
 </div>
 
-<!-- SEARCH -->
 <div class="search-bar">
 <input type="text" id="searchInput" placeholder="চ্যানেল খুঁজুন..." oninput="search(this.value)">
 </div>
 
-<!-- CATEGORY CONTAINER -->
 <div id="categoriesContainer"></div>
-
 </div>
 
 <script>
@@ -112,7 +106,7 @@ let last=localStorage.getItem("last_tv");
 if(last) play(last);
 }
 
-// RENDER CATEGORIES (Netflix/Tubi style)
+// RENDER CATEGORIES
 function renderCategories(){
 categoriesContainer.innerHTML="";
 let groups=[...new Set(channels.map(c=>c.group))];
@@ -155,11 +149,23 @@ hls.on(Hls.Events.MANIFEST_PARSED,()=>video.play());
 video.src=url; video.play();
 }
 video.onplaying=()=>loader.style.display="none";
+autoplayNext(url);
+}
+
+// AUTOPLAY NEXT CHANNEL IN ROW
+function autoplayNext(url){
+let currentCard=document.querySelector(`.card[data-url="${url}"]`);
+if(!currentCard) return;
+let row=currentCard.closest(".row-scroll");
+let cards=[...row.querySelectorAll(".card")];
+let idx=cards.findIndex(c=>c===currentCard);
+if(idx<cards.length-1){
+cards[idx+1].addEventListener("mouseenter",()=>play(cards[idx+1].dataset.url),{once:true});
+}
 }
 
 // SEARCH
 function search(q){
-channels.forEach(c=>c.element?.parentNode?.removeChild(c.element));
 filtered=channels.filter(c=>c.name.toLowerCase().includes(q.toLowerCase()));
 renderCategories();
 }
@@ -179,7 +185,7 @@ document.getElementById("vbox").requestFullscreen():
 document.exitFullscreen();
 }
 
-// MOBILE PULL-DOWN REFRESH (simple)
+// PULL-DOWN REFRESH MOBILE
 let touchStartY=0;
 document.addEventListener('touchstart',e=>{touchStartY=e.touches[0].clientY;});
 document.addEventListener('touchend',e=>{
@@ -189,6 +195,5 @@ if(touchEndY - touchStartY > 50){renderCategories();}
 
 init();
 </script>
-
 </body>
 </html>
