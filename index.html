@@ -22,8 +22,8 @@
 }
 
 /* GENERAL */
-*{margin:0;padding:0;box-sizing:border-box;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;}
-body,html{font-family:'Inter',sans-serif;background:radial-gradient(circle at top,#111,#000 60%);color:#fff;overflow:hidden;height:100%;font-size:16px;}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif;}
+body,html{background:radial-gradient(circle at top,#111,#000 60%);color:#fff;overflow:hidden;height:100%;font-size:16px;}
 .app{display:flex;height:100vh;}
 
 /* SIDEBAR */
@@ -50,12 +50,12 @@ video{width:100%;height:100%;object-fit:contain;background:#000;}
 .cat-btn.active{background:var(--primary);color:#fff;box-shadow:var(--glow);}
 
 /* GRID */
-.grid{flex:1;overflow-y:auto;display:grid;gap:25px;padding:20px;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));}
-.card{background:linear-gradient(180deg,#202020,#0f0f0f);border-radius:20px;padding:18px;text-align:center;cursor:pointer;border:3px solid transparent;transition:.3s cubic-bezier(.4,0,.2,1);outline:none;position:relative;}
-.card img{width:80px;height:80px;margin-bottom:12px;filter:drop-shadow(0 0 8px rgba(255,255,255,.25));}
+.grid{flex:1;overflow-y:auto;display:grid;gap:20px;padding:20px;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));}
+.card{background:linear-gradient(180deg,#202020,#0f0f0f);border-radius:20px;padding:16px;text-align:center;cursor:pointer;border:3px solid transparent;transition:.25s cubic-bezier(.4,0,.2,1);outline:none;position:relative;}
+.card img{width:80px;height:80px;margin-bottom:10px;filter:drop-shadow(0 0 8px rgba(255,255,255,.25));border-radius:10px;}
 .card span{font-size:16px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.card:focus{transform:scale(1.18);border-color:var(--primary);box-shadow:var(--glow);z-index:10;}
-.card .fav{position:absolute;top:10px;right:10px;font-size:20px;color:#ff0;display:none;}
+.card:focus{transform:scale(1.15);border-color:var(--primary);box-shadow:var(--glow);z-index:10;}
+.card .fav{position:absolute;top:8px;right:8px;font-size:20px;color:#ff0;display:none;}
 .card.is-fav .fav{display:block;}
 
 /* MOBILE RESPONSIVE */
@@ -113,14 +113,19 @@ const now=document.getElementById("now");
 let channels=[],filtered=[],current="",hls,favorites=JSON.parse(localStorage.getItem("tv_favs"))||[];
 
 // ===== INIT =====
-fetch(M3U).then(r=>r.text()).then(parse);
-
+async function init(){
+try{
+let res=await fetch(M3U);
+let data=await res.text();
+parse(data);
+}catch(e){console.log("Load Error",e);}
+}
 function parse(data){
 let lines=data.split("\n"),item={};
 lines.forEach(l=>{
 if(l.startsWith("#EXTINF")){
 item.name=l.split(",")[1]||"TV";
-item.logo=l.match(/tvg-logo="(.*?)"/)?.[1]||"";
+item.logo=l.match(/tvg-logo="(.*?)"/)?.[1]||"https://via.placeholder.com/100";
 item.group=l.match(/group-title="(.*?)"/)?.[1]||"All";
 }else if(l.startsWith("http")){
 item.url=l.trim();
@@ -138,9 +143,9 @@ if(last) play(last);
 // ===== RENDER CHANNELS =====
 function render(list){
 grid.innerHTML=list.map(c=>`
-<div class="card ${favorites.includes(c.url)?'is-fav':''}" tabindex="0" onclick="play('${c.url}')"
+<div class="card ${favorites.includes(c.url)?'is-fav':''}" tabindex="0" onclick="play('${c.url}')" 
 oncontextmenu="toggleFav(event,'${c.url}')">
-<img src="${c.logo||'https://via.placeholder.com/100'}">
+<img src="${c.logo}">
 <span>${c.name}</span>
 <div class="fav">⭐</div>
 </div>`).join("");
@@ -172,6 +177,7 @@ setTimeout(()=>{if(video.readyState<3) next();},7000);
 
 // ===== NEXT CHANNEL =====
 function next(){
+if(filtered.length===0) return;
 let i=filtered.findIndex(c=>c.url===current);
 i=(i+1)%filtered.length;
 play(filtered[i].url);
@@ -213,14 +219,16 @@ document.exitFullscreen();
 
 // ===== REMOTE KEYS =====
 window.addEventListener("keydown",e=>{
+let active=document.activeElement;
 if(e.key==="ArrowUp") next();
 if(e.key==="ArrowDown") next();
 if(e.key==="Enter"){
-let active=document.activeElement;
-if(active.classList.contains("card")) play(active.dataset?.url||current);
+if(active.classList.contains("card")) active.click();
 if(active.id==="vbox") toggleFS();
 }
 });
+
+init();
 </script>
 </body>
 </html>
