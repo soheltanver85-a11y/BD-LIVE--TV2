@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Universal TV Pro</title>
+<title>Universal TV Pro - Mobile & TV</title>
 
 <!-- FONT -->
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -15,215 +15,79 @@
 :root{
 --primary:#ff2a2a;
 --bg:#050505;
---card:#121212;
+--card:#1a1a1a;
 --glass:rgba(255,255,255,.06);
 --glow:0 0 20px rgba(255,42,42,.6);
+--focus:#fff;
 }
 
-*{
--webkit-font-smoothing:antialiased;
-text-rendering:optimizeLegibility;
-}
+/* GENERAL */
+*{margin:0;padding:0;box-sizing:border-box;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;}
+body,html{font-family:'Inter',sans-serif;background:radial-gradient(circle at top,#111,#000 60%);color:#fff;overflow:hidden;height:100%;font-size:16px;}
+.app{display:flex;height:100vh;}
 
-html,body{
-margin:0;
-height:100%;
-background:radial-gradient(circle at top,#111,#000 60%);
-color:#fff;
-font-family:'Inter',system-ui;
-overflow:hidden;
-}
+/* SIDEBAR */
+.sidebar{width:90px;background:#000;display:flex;flex-direction:column;align-items:center;gap:25px;padding-top:25px;border-right:1px solid #222;}
+.nav-btn{background:var(--glass);border:none;border-radius:999px;padding:12px 16px;font-size:18px;color:#ccc;cursor:pointer;transition:0.25s;}
+.nav-btn.active{background:var(--primary);color:#fff;box-shadow:var(--glow);}
 
-.app{display:flex;height:100vh}
+/* MAIN */
+.main{flex:1;display:flex;flex-direction:column;}
 
-/* Sidebar */
-.sidebar{
-width:80px;
-background:#000;
-display:flex;
-flex-direction:column;
-align-items:center;
-gap:20px;
-padding-top:20px;
-border-right:1px solid #111;
-}
-.nav-btn{
-background:var(--glass);
-border:none;
-border-radius:999px;
-padding:10px 14px;
-font-size:16px;
-color:#ccc;
-cursor:pointer;
-}
-.nav-btn.active{
-background:var(--primary);
-color:#fff;
-box-shadow:var(--glow);
-}
+/* VIDEO */
+.video-box{height:55vh;background:#000;position:relative;border-bottom:1px solid rgba(255,255,255,.08);}
+video{width:100%;height:100%;object-fit:contain;background:#000;}
+#loader{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:50px;height:50px;border:5px solid #eee;border-top:5px solid var(--primary);border-radius:50%;animation:spin 1s linear infinite;display:none;z-index:10;}
+@keyframes spin{100%{transform:translate(-50%,-50%) rotate(360deg)}}
+#now{position:absolute;bottom:14px;left:14px;background:rgba(0,0,0,.6);padding:10px 16px;border-radius:10px;font-weight:700;font-size:20px;}
 
-/* Main layout */
-.main{flex:1;display:flex;flex-direction:column}
-
-/* Video box */
-.video-box{
-height:50vh;
-background:#000;
-position:relative;
-border-bottom:1px solid rgba(255,255,255,.08);
-}
-video{
-width:100%;
-height:100%;
-object-fit:contain;
-background:#000;
-}
-#loader{
-position:absolute;
-top:50%;
-left:50%;
-transform:translate(-50%,-50%);
-width:40px;
-height:40px;
-border:4px solid #eee;
-border-top:4px solid var(--primary);
-border-radius:50%;
-animation:spin 1s linear infinite;
-display:none;
-z-index:10;
-}
-@keyframes spin{
-100%{transform:translate(-50%,-50%) rotate(360deg)}
-}
-#now{
-position:absolute;
-bottom:12px;
-left:12px;
-background:rgba(0,0,0,.6);
-padding:8px 14px;
-border-radius:8px;
-font-weight:700;
-font-size:18px;
-}
-
-/* Top search + category */
-.top{
-padding:12px;
-border-bottom:1px solid #111;
-display:flex;
-flex-direction:column;
-gap:10px;
-}
-.search{
-width:95%;
-padding:12px;
-font-size:17px;
-background:#1a1a1a;
-color:#fff;
-border:none;
-border-radius:10px;
-outline:none;
-}
-
-/* Category bar */
-.cat-bar{
-display:flex;
-gap:10px;
-overflow-x:auto;
-white-space:nowrap;
-padding:0 5px;
-}
+/* TOP SEARCH + CATEGORY */
+.top{padding:14px;border-bottom:1px solid #222;display:flex;flex-direction:column;gap:12px;}
+.search{width:95%;padding:14px;font-size:18px;background:#222;color:#fff;border:none;border-radius:12px;outline:none;}
+.cat-bar{display:flex;gap:12px;overflow-x:auto;white-space:nowrap;padding:0 5px;}
 .cat-bar::-webkit-scrollbar{display:none;}
-.cat-btn{
-padding:8px 16px;
-border-radius:999px;
-background:var(--glass);
-border:none;
-color:#ccc;
-cursor:pointer;
-flex-shrink:0;
-transition:.25s;
-}
-.cat-btn.active{
-background:var(--primary);
-color:#fff;
-box-shadow:var(--glow);
-}
+.cat-btn{padding:10px 20px;border-radius:999px;background:var(--glass);border:none;color:#ccc;cursor:pointer;flex-shrink:0;font-size:16px;transition:0.25s;}
+.cat-btn.active{background:var(--primary);color:#fff;box-shadow:var(--glow);}
 
-/* Grid of channels */
-.grid{
-flex:1;
-overflow-y:auto;
-display:grid;
-gap:22px;
-padding:18px;
-grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
-}
-
-.card{
-background:linear-gradient(180deg,#181818,#0c0c0c);
-border-radius:18px;
-padding:16px;
-text-align:center;
-cursor:pointer;
-border:3px solid transparent;
-transition:.25s cubic-bezier(.4,0,.2,1);
-outline:none;
-position:relative;
-}
-.card img{
-width:70px;
-height:70px;
-margin-bottom:10px;
-filter:drop-shadow(0 0 6px rgba(255,255,255,.25));
-}
-.card span{
-font-size:15px;
-font-weight:600;
-white-space:nowrap;
-overflow:hidden;
-text-overflow:ellipsis;
-}
-/* Focus */
-.card:focus{
-transform:scale(1.15);
-border-color:var(--primary);
-box-shadow:var(--glow);
-z-index:10;
-}
-/* Favorite star */
-.card .fav{
-position:absolute;
-top:8px;
-right:8px;
-font-size:18px;
-color:#ff0;
-display:none;
-}
+/* GRID */
+.grid{flex:1;overflow-y:auto;display:grid;gap:25px;padding:20px;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));}
+.card{background:linear-gradient(180deg,#202020,#0f0f0f);border-radius:20px;padding:18px;text-align:center;cursor:pointer;border:3px solid transparent;transition:.3s cubic-bezier(.4,0,.2,1);outline:none;position:relative;}
+.card img{width:80px;height:80px;margin-bottom:12px;filter:drop-shadow(0 0 8px rgba(255,255,255,.25));}
+.card span{font-size:16px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.card:focus{transform:scale(1.18);border-color:var(--primary);box-shadow:var(--glow);z-index:10;}
+.card .fav{position:absolute;top:10px;right:10px;font-size:20px;color:#ff0;display:none;}
 .card.is-fav .fav{display:block;}
+
+/* MOBILE RESPONSIVE */
+@media(max-width:768px){
+.video-box{height:40vh;}
+.card img{width:60px;height:60px;}
+.card span{font-size:14px;}
+.cat-btn{font-size:14px;padding:8px 14px;}
+.search{font-size:16px;padding:10px;}
+#now{font-size:16px;padding:6px 10px;}
+.grid{gap:15px;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));padding:12px;}
+#loader{width:30px;height:30px;border-width:3px;border-top-width:3px;}
+}
 </style>
 </head>
-
 <body>
 
 <div class="app">
-
 <!-- Sidebar -->
 <nav class="sidebar">
 <button class="nav-btn active" onclick="filterCategory('All',this)">🏠</button>
 <button class="nav-btn" onclick="filterCategory('Favorite',this)">⭐</button>
 </nav>
 
+<!-- Main Content -->
 <div class="main">
-
-<!-- Video -->
 <div class="video-box" id="vbox" onclick="toggleFS()">
 <div id="loader"></div>
 <div id="now"></div>
 <video id="player" autoplay playsinline webkit-playsinline></video>
 </div>
 
-<!-- Search + Category -->
 <div class="top">
 <input class="search" placeholder="চ্যানেল খুঁজুন..." oninput="search(this.value)">
 <div class="cat-bar" id="catBar">
@@ -234,14 +98,12 @@ display:none;
 </div>
 </div>
 
-<!-- Channel grid -->
 <div class="grid" id="grid"></div>
-
 </div>
 </div>
 
 <script>
-// ====== Config ======
+// ===== CONFIG =====
 const M3U="https://raw.githubusercontent.com/soheltanver85-a11y/Live-tv2/main/Live-tv2";
 const video=document.getElementById("player");
 const grid=document.getElementById("grid");
@@ -250,7 +112,7 @@ const now=document.getElementById("now");
 
 let channels=[],filtered=[],current="",hls,favorites=JSON.parse(localStorage.getItem("tv_favs"))||[];
 
-// ====== Init ======
+// ===== INIT =====
 fetch(M3U).then(r=>r.text()).then(parse);
 
 function parse(data){
@@ -273,7 +135,7 @@ let last=localStorage.getItem("last_tv");
 if(last) play(last);
 }
 
-// ====== Render Channels ======
+// ===== RENDER CHANNELS =====
 function render(list){
 grid.innerHTML=list.map(c=>`
 <div class="card ${favorites.includes(c.url)?'is-fav':''}" tabindex="0" onclick="play('${c.url}')"
@@ -284,7 +146,7 @@ oncontextmenu="toggleFav(event,'${c.url}')">
 </div>`).join("");
 }
 
-// ====== Play Channel ======
+// ===== PLAY =====
 function play(url){
 current=url;
 localStorage.setItem("last_tv",url);
@@ -308,20 +170,20 @@ video.onplaying=()=>loader.style.display="none";
 setTimeout(()=>{if(video.readyState<3) next();},7000);
 }
 
-// ====== Next Channel ======
+// ===== NEXT CHANNEL =====
 function next(){
 let i=filtered.findIndex(c=>c.url===current);
 i=(i+1)%filtered.length;
 play(filtered[i].url);
 }
 
-// ====== Search ======
+// ===== SEARCH =====
 function search(q){
 filtered=channels.filter(c=>c.name.toLowerCase().includes(q.toLowerCase()));
 render(filtered);
 }
 
-// ====== Category Filter ======
+// ===== CATEGORY =====
 function filterCategory(cat,btn){
 document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));
 btn.classList.add('active');
@@ -332,7 +194,7 @@ filtered = (cat==='All') ? channels :
 render(filtered);
 }
 
-// ====== Favorite Toggle ======
+// ===== FAVORITES =====
 function toggleFav(e,url){
 e.preventDefault();
 if(favorites.includes(url)){
@@ -342,14 +204,14 @@ localStorage.setItem("tv_favs",JSON.stringify(favorites));
 render(filtered);
 }
 
-// ====== Fullscreen ======
+// ===== FULLSCREEN =====
 function toggleFS(){
 !document.fullscreenElement?
 document.getElementById("vbox").requestFullscreen():
 document.exitFullscreen();
 }
 
-// ====== Remote Keys ======
+// ===== REMOTE KEYS =====
 window.addEventListener("keydown",e=>{
 if(e.key==="ArrowUp") next();
 if(e.key==="ArrowDown") next();
@@ -360,6 +222,5 @@ if(active.id==="vbox") toggleFS();
 }
 });
 </script>
-
 </body>
 </html>
