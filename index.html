@@ -1,237 +1,289 @@
 <!DOCTYPE html>
 <html lang="bn">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Universal TV - Search & Auto-Play Edition</title>
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-    <style>
-        :root { --primary: #e50914; --bg: #0a0a0a; --card: #1a1a1a; --text: #ffffff; --focus: #ffffff; }
-        
-        body, html { 
-            margin: 0; padding: 0; background: var(--bg); color: var(--text);
-            font-family: 'Segoe UI', Roboto, sans-serif; height: 100vh; overflow: hidden;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Universal TV Pro</title>
 
-        .app-container { display: flex; height: 100vh; }
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 
-        .sidebar {
-            width: 80px; background: #000; display: flex; flex-direction: column;
-            align-items: center; padding-top: 20px; gap: 20px; border-right: 1px solid #222;
-        }
+<style>
+:root{
+--primary:#e50914;
+--bg:#0a0a0a;
+--card:#1a1a1a;
+--text:#fff;
+}
 
-        .main-content { flex: 1; display: flex; flex-direction: column; height: 100vh; }
+html,body{
+margin:0;
+padding:0;
+height:100%;
+background:var(--bg);
+color:var(--text);
+font-family:Segoe UI,Roboto,sans-serif;
+overflow:hidden;
+}
 
-        .video-box { width: 100%; height: 45vh; background: #000; position: relative; cursor: pointer; }
-        video { width: 100%; height: 100%; object-fit: contain; }
+.app-container{display:flex;height:100vh;}
 
-        /* সার্চ এবং ফিল্টার বার */
-        .top-controls { background: var(--bg); border-bottom: 1px solid #222; padding: 10px 15px; }
-        
-        .search-box {
-            width: 95%; background: #222; border: 2px solid transparent; color: #fff;
-            padding: 10px; border-radius: 8px; font-size: 16px; outline: none; margin-bottom: 10px;
-        }
-        .search-box:focus { border-color: var(--primary); background: #333; }
+.sidebar{
+width:80px;
+background:#000;
+display:flex;
+flex-direction:column;
+align-items:center;
+gap:20px;
+padding-top:20px;
+border-right:1px solid #222;
+}
 
-        .cat-bar { display: flex; overflow-x: auto; white-space: nowrap; gap: 10px; }
-        .cat-bar::-webkit-scrollbar { display: none; }
+.nav-btn{
+background:#222;
+color:#aaa;
+border:none;
+border-radius:6px;
+padding:8px 14px;
+font-size:16px;
+cursor:pointer;
+}
 
-        .nav-btn {
-            background: #222; border: 2px solid transparent; color: #aaa; padding: 8px 16px;
-            border-radius: 6px; cursor: pointer; font-size: 14px; outline: none;
-        }
-        .nav-btn:focus { border-color: var(--focus); background: var(--primary); color: #fff; }
-        .nav-btn.active { background: var(--primary); color: #fff; }
+.nav-btn.active{
+background:var(--primary);
+color:#fff;
+}
 
-        .grid { 
-            flex: 1; overflow-y: auto; display: grid; padding: 15px; gap: 15px;
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-            scroll-behavior: smooth;
-        }
+.main-content{flex:1;display:flex;flex-direction:column;height:100%;}
 
-        .card {
-            background: var(--card); border-radius: 10px; padding: 12px; text-align: center;
-            border: 3px solid transparent; transition: 0.2s; cursor: pointer; outline: none;
-            position: relative;
-        }
-        .card:focus { border-color: var(--focus); transform: scale(1.08); background: #252525; }
+.video-box{
+height:45vh;
+background:#000;
+position:relative;
+}
 
-        .card img { width: 60px; height: 60px; object-fit: contain; margin-bottom: 8px; pointer-events: none; }
-        .card span { font-size: 14px; font-weight: bold; display: block; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+video{
+width:100%;
+height:100%;
+object-fit:contain;
+background:#000;
+}
 
-        #loader {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            border: 4px solid #f3f3f3; border-top: 4px solid var(--primary);
-            border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite;
-            display: none; z-index: 10;
-        }
-        @keyframes spin { 0% { transform: translate(-50%, -50%) rotate(0deg); } 100% { transform: translate(-50%, -50%) rotate(360deg); } }
-    </style>
+#loader{
+position:absolute;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+width:40px;
+height:40px;
+border:4px solid #eee;
+border-top:4px solid var(--primary);
+border-radius:50%;
+animation:spin 1s linear infinite;
+display:none;
+z-index:10;
+}
+
+@keyframes spin{
+100%{transform:translate(-50%,-50%) rotate(360deg);}
+}
+
+#nowPlaying{
+position:absolute;
+bottom:10px;
+left:10px;
+background:rgba(0,0,0,.6);
+padding:8px 12px;
+border-radius:6px;
+font-weight:bold;
+}
+
+.top-controls{
+padding:10px;
+border-bottom:1px solid #222;
+}
+
+.search-box{
+width:95%;
+padding:10px;
+font-size:16px;
+background:#222;
+color:#fff;
+border-radius:8px;
+border:2px solid transparent;
+outline:none;
+}
+
+.search-box:focus{border-color:var(--primary);}
+
+.cat-bar{
+display:flex;
+gap:10px;
+margin-top:10px;
+overflow-x:auto;
+}
+
+.grid{
+flex:1;
+overflow-y:auto;
+display:grid;
+gap:15px;
+padding:15px;
+grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
+}
+
+.card{
+background:var(--card);
+border-radius:10px;
+padding:12px;
+text-align:center;
+cursor:pointer;
+border:4px solid transparent;
+outline:none;
+transition:.2s;
+}
+
+.card:focus{
+border-color:#fff;
+box-shadow:0 0 15px var(--primary);
+transform:scale(1.08);
+}
+
+.card img{
+width:60px;
+height:60px;
+object-fit:contain;
+margin-bottom:6px;
+}
+
+.card span{
+font-size:14px;
+font-weight:bold;
+white-space:nowrap;
+overflow:hidden;
+text-overflow:ellipsis;
+}
+</style>
 </head>
+
 <body>
 
-    <div class="app-container">
-        <nav class="sidebar">
-            <button class="nav-btn active" onclick="filter('All', this)" id="home-btn">🏠</button>
-            <button class="nav-btn" onclick="filter('Favorite', this)">⭐</button>
-        </nav>
+<div class="app-container">
 
-        <main class="main-content">
-            <div class="video-box" onclick="toggleFullScreen()" id="v-container">
-                <div id="loader"></div>
-                <video id="player" autoplay></video>
-            </div>
+<nav class="sidebar">
+<button class="nav-btn active" onclick="filter('All',this)" id="homeBtn">🏠</button>
+<button class="nav-btn" onclick="filter('Favorite',this)">⭐</button>
+</nav>
 
-            <div class="top-controls">
-                <input type="text" id="searchInput" class="search-box" placeholder="চ্যানেলের নাম লিখুন..." oninput="searchChannel(this.value)">
-                
-                <div class="cat-bar">
-                    <button class="nav-btn active" onclick="filter('All', this)">All</button>
-                    <button class="nav-btn" onclick="filter('Favorite', this)">Favorite</button>
-                    <button class="nav-btn" onclick="filter('বাংলা', this)">বাংলা</button>
-                    <button class="nav-btn" onclick="filter('Sports', this)">Sports</button>
-                </div>
-            </div>
+<main class="main-content">
 
-            <div class="grid" id="grid"></div>
-        </main>
-    </div>
+<div class="video-box" id="vbox" onclick="toggleFullScreen()">
+<div id="loader"></div>
+<div id="nowPlaying"></div>
+<video id="player" autoplay playsinline webkit-playsinline></video>
+</div>
 
-    <script>
-        const m3u = 'https://raw.githubusercontent.com/soheltanver85-a11y/Live-tv2/refs/heads/main/Live-tv2';
-        const video = document.getElementById('player');
-        const loader = document.getElementById('loader');
-        let channels = [];
-        let filteredChannels = [];
-        let currentUrl = "";
-        let favorites = JSON.parse(localStorage.getItem('tv_favs')) || [];
+<div class="top-controls">
+<input class="search-box" placeholder="চ্যানেলের নাম লিখুন..." oninput="searchChannel(this.value)">
+<div class="cat-bar">
+<button class="nav-btn active" onclick="filter('All',this)">All</button>
+<button class="nav-btn" onclick="filter('Favorite',this)">Favorite</button>
+<button class="nav-btn" onclick="filter('বাংলা',this)">বাংলা</button>
+<button class="nav-btn" onclick="filter('Sports',this)">Sports</button>
+</div>
+</div>
 
-        async function init() {
-            try {
-                const res = await fetch(m3u);
-                const text = await res.text();
-                parse(text);
-                filteredChannels = [...channels];
-                render(filteredChannels);
-                
-                // লাস্ট ওয়াচড চ্যানেল প্লে করা
-                const lastUrl = localStorage.getItem('last_tv_url');
-                if(lastUrl) play(lastUrl);
-                
-                document.getElementById('home-btn').focus();
-            } catch (e) { console.log("Load error"); }
-        }
+<div class="grid" id="grid"></div>
 
-        function parse(data) {
-            const lines = data.split('\n');
-            let item = {};
-            lines.forEach(l => {
-                if (l.startsWith('#EXTINF')) {
-                    item.name = l.split(',')[1]?.trim() || "Unknown";
-                    item.logo = l.match(/tvg-logo="(.*?)"/)?.[1] || "";
-                    item.group = l.match(/group-title="(.*?)"/)?.[1] || "All";
-                } else if (l.startsWith('http')) {
-                    item.url = l.trim();
-                    channels.push({...item});
-                    item = {};
-                }
-            });
-        }
+</main>
+</div>
 
-        function render(list) {
-            const g = document.getElementById('grid');
-            if (list.length === 0) {
-                g.innerHTML = `<p style="padding:20px">চ্যানেল পাওয়া যায়নি!</p>`;
-                return;
-            }
-            g.innerHTML = list.map(c => {
-                const isFav = favorites.includes(c.url);
-                return `
-                <div class="card ${isFav ? 'is-fav' : ''}" 
-                     tabindex="0" 
-                     data-url="${c.url}"
-                     onclick="play('${c.url}')">
-                    <img src="${c.logo}" onerror="this.src='https://via.placeholder.com/100/222/fff?text=TV'">
-                    <span>${c.name}</span>
-                </div>
-            `}).join('');
-        }
+<script>
+const m3u='https://raw.githubusercontent.com/soheltanver85-a11y/Live-tv2/refs/heads/main/Live-tv2';
+const video=document.getElementById('player');
+const loader=document.getElementById('loader');
+const nowPlaying=document.getElementById('nowPlaying');
 
-        // সার্চ ফাংশন
-        function searchChannel(query) {
-            const res = channels.filter(c => c.name.toLowerCase().includes(query.toLowerCase()));
-            filteredChannels = res;
-            render(res);
-        }
+let channels=[];
+let filtered=[];
+let currentUrl="";
+let hls;
+let favorites=JSON.parse(localStorage.getItem('tv_favs'))||[];
 
-        // নেক্সট/প্রিভিয়াস চ্যানেল সুইচ
-        function switchChannel(direction) {
-            let index = filteredChannels.findIndex(c => c.url === currentUrl);
-            if (direction === 'next') index = (index + 1) % filteredChannels.length;
-            else index = (index - 1 + filteredChannels.length) % filteredChannels.length;
-            
-            const nextChannel = filteredChannels[index];
-            if (nextChannel) play(nextChannel.url);
-        }
+fetch(m3u).then(r=>r.text()).then(parse);
 
-        // রিমোট কন্ট্রোল ইভেন্টস
-        window.addEventListener('keydown', (e) => {
-            const active = document.activeElement;
+function parse(data){
+let lines=data.split('\n'),item={};
+lines.forEach(l=>{
+if(l.startsWith('#EXTINF')){
+item.name=l.split(',')[1];
+item.logo=l.match(/tvg-logo="(.*?)"/)?.[1];
+item.group=l.match(/group-title="(.*?)"/)?.[1]||'All';
+}
+else if(l.startsWith('http')){
+item.url=l.trim();
+channels.push({...item});
+item={};
+}
+});
+filtered=[...channels];
+render(filtered);
 
-            if (e.key === 'Enter') {
-                if (active.classList.contains('card')) play(active.dataset.url);
-                else if (active.id === 'v-container') toggleFullScreen();
-            }
+let last=localStorage.getItem('last_tv_url');
+if(last) play(last);
+}
 
-            // চ্যানেল চেঞ্জ লজিক (রিমোটের Up/Down বা কিবোর্ড কি)
-            if (active.id === 'v-container') {
-                if (e.key === 'ArrowUp') switchChannel('prev');
-                if (e.key === 'ArrowDown') switchChannel('next');
-            }
-        });
+function render(list){
+grid.innerHTML=list.map(c=>`
+<div class="card" tabindex="0" onclick="play('${c.url}')" data-url="${c.url}">
+<img src="${c.logo||'https://via.placeholder.com/100'}">
+<span>${c.name}</span>
+</div>`).join('');
+}
 
-        function play(url) {
-            currentUrl = url;
-            localStorage.setItem('last_tv_url', url); // লাস্ট ওয়াচড সেভ
-            loader.style.display = 'block';
-            
-            if (Hls.isSupported()) {
-                const hls = new Hls();
-                hls.loadSource(url);
-                hls.attachMedia(video);
-                hls.on(Hls.Events.MANIFEST_PARSED, () => {
-                    video.play();
-                    loader.style.display = 'none';
-                });
-                hls.on(Hls.Events.ERROR, () => loader.style.display = 'none');
-            } else {
-                video.src = url;
-                video.play();
-                video.onplaying = () => loader.style.display = 'none';
-            }
-        }
+function play(url){
+currentUrl=url;
+localStorage.setItem('last_tv_url',url);
+loader.style.display='block';
 
-        function toggleFullScreen() {
-            const container = document.getElementById('v-container');
-            if (!document.fullscreenElement) {
-                container.requestFullscreen().catch(err => console.log(err));
-            } else {
-                document.exitFullscreen();
-            }
-        }
+let ch=channels.find(c=>c.url===url);
+nowPlaying.innerText=ch?.name||"";
 
-        function filter(cat, btn) {
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            document.getElementById('searchInput').value = ""; // ফিল্টার করলে সার্চ রিসেট
-            filteredChannels = (cat === 'All') ? channels : 
-                               (cat === 'Favorite') ? channels.filter(c => favorites.includes(c.url)) :
-                               channels.filter(c => c.group.toLowerCase().includes(cat.toLowerCase()));
-            render(filteredChannels);
-        }
+if(hls) hls.destroy();
 
-        init();
-    </script>
-</body>
-</html>
+if(Hls.isSupported()){
+hls=new Hls({lowLatencyMode:true});
+hls.loadSource(url);
+hls.attachMedia(video);
+hls.on(Hls.Events.MANIFEST_PARSED,()=>video.play());
+hls.on(Hls.Events.ERROR,(e,d)=>{if(d.fatal) switchChannel('next');});
+}
+else{
+video.src=url;
+video.play();
+}
+
+video.onplaying=()=>loader.style.display='none';
+}
+
+function switchChannel(dir){
+let i=filtered.findIndex(c=>c.url===currentUrl);
+i=dir==='next'?(i+1)%filtered.length:(i-1+filtered.length)%filtered.length;
+play(filtered[i].url);
+}
+
+function searchChannel(q){
+filtered=channels.filter(c=>c.name.toLowerCase().includes(q.toLowerCase()));
+render(filtered);
+}
+
+function filter(cat,btn){
+document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+btn.classList.add('active');
+filtered=cat==='All'?channels:
+cat==='Favorite'?channels.filter(c=>favorites.includes(c.url)):
+channels.filter(c=>c.group.toLowerCase().includes(cat.toLowerCase()));
+render(filtered);
+}
+
+function toggleFullScreen(){
+let box=document.getElementById('vbox
