@@ -3,108 +3,191 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Premium TV - Favorite System</title>
+    <title>Premium IPTV Pro</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <style>
         :root {
-            --primary: #ff3e3e;
+            --primary: #ff2a2a;
+            --secondary: #2ecc71;
             --bg: #0a0a0a;
             --card-bg: #1a1a1a;
             --text: #ffffff;
         }
 
-        body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; margin: 0; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background: var(--bg); color: var(--text); overflow-x: hidden; }
 
-        /* Video Section */
-        .video-container { width: 100%; position: sticky; top: 0; z-index: 100; background: #000; border-bottom: 2px solid var(--primary); }
+        /* Video Player */
+        .video-box {
+            width: 100%;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: #000;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
         video { width: 100%; aspect-ratio: 16/9; display: block; }
 
-        /* Actions */
-        .action-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 15px; }
-        .btn { padding: 12px; border-radius: 25px; border: none; font-weight: 700; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
-        .btn-mobile { background: linear-gradient(90deg, #ff416c, #ff4b2b); }
-        .btn-tv { background: linear-gradient(90deg, #1d976c, #93f9b9); color: #000; }
-
-        /* Grid & Cards */
-        .channel-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; padding: 15px; }
-        .channel-card { background: var(--card-bg); border-radius: 15px; position: relative; overflow: hidden; transition: 0.3s; border: 1px solid #222; }
+        /* Search & Actions */
+        .container { padding: 15px; }
         
-        .logo-box { height: 90px; background: #fff; display: flex; align-items: center; justify-content: center; padding: 10px; cursor: pointer; }
-        .logo-box img { max-height: 100%; max-width: 100%; object-fit: contain; }
-        
-        .info { padding: 10px; text-align: center; font-size: 14px; font-weight: 600; cursor: pointer; }
+        .search-box {
+            width: 100%;
+            padding: 12px 20px;
+            border-radius: 12px;
+            border: 1px solid #333;
+            background: #1f1f1f;
+            color: white;
+            margin-bottom: 15px;
+            outline: none;
+        }
 
-        /* Heart / Favorite Button */
-        .fav-heart {
+        .action-btns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .btn {
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            font-weight: 700;
+            color: white;
+            cursor: pointer;
+            text-align: center;
+        }
+        .btn-mobile { background: #ff4141; }
+        .btn-tv { background: #27ae60; }
+
+        /* Categories Section */
+        .cat-row {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 15px;
+            scrollbar-width: none;
+        }
+        .cat-row::-webkit-scrollbar { display: none; }
+        
+        .cat-btn {
+            padding: 10px 20px;
+            background: #222;
+            border-radius: 25px;
+            white-space: nowrap;
+            font-size: 14px;
+            font-weight: 600;
+            border: 1px solid #333;
+            cursor: pointer;
+        }
+        .cat-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+
+        /* Channel Grid */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+            transition: 0.3s;
+            border: 1px solid #222;
+        }
+        .card:active { transform: scale(0.96); }
+
+        .logo-area {
+            height: 90px;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+        }
+        .logo-area img { max-height: 100%; max-width: 100%; object-fit: contain; }
+
+        .ch-title {
+            padding: 10px;
+            text-align: center;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        /* Love Icon */
+        .love-icon {
             position: absolute;
-            top: 8px;
-            right: 8px;
-            width: 35px;
-            height: 35px;
-            background: rgba(0,0,0,0.4);
+            top: 5px;
+            right: 5px;
+            background: rgba(0,0,0,0.5);
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
-            z-index: 10;
+            z-index: 5;
             transition: 0.3s;
-            backdrop-filter: blur(5px);
         }
-
-        .fav-heart svg {
-            width: 20px;
-            height: 20px;
-            fill: rgba(255,255,255,0.5); /* Default color (Gray/White) */
+        .love-icon svg {
+            width: 18px;
+            fill: #ccc;
             transition: 0.3s;
-            stroke: white;
-            stroke-width: 2px;
+        }
+        .card.is-fav .love-icon svg {
+            fill: #ff2a2a;
+            filter: drop-shadow(0 0 5px red);
         }
 
-        /* যখন ফেভারিট হবে (Active State) */
-        .channel-card.is-fav .fav-heart svg {
-            fill: #ff3e3e; /* লাল রঙ */
-            stroke: #ff3e3e;
-            filter: drop-shadow(0 0 5px rgba(255,62,62,0.8)); /* উজ্জ্বল ইফেক্ট */
-        }
-        
-        .channel-card.is-fav .fav-heart {
-            background: rgba(255,255,255,0.15);
-        }
-
-        @media (min-width: 768px) { .channel-grid { grid-template-columns: repeat(4, 1fr); } }
+        @media (min-width: 768px) { .grid { grid-template-columns: repeat(4, 1fr); } }
     </style>
 </head>
 <body>
 
-<div class="video-container">
-    <video id="player" controls autoplay playsinline></video>
+<div class="video-box">
+    <video id="tvPlayer" controls autoplay playsinline></video>
 </div>
 
-<div class="action-buttons">
-    <button class="btn btn-mobile">📱 Mobile App</button>
-    <button class="btn btn-tv">📺 TV App</button>
-</div>
-
-<div class="channel-grid" id="channelGrid">
+<div class="container">
+    <div class="action-btns">
+        <button class="btn btn-mobile">📱 Mobile App</button>
+        <button class="btn btn-tv">📺 TV App</button>
     </div>
 
+    <input type="text" class="search-box" id="search" placeholder="চ্যানেলের নাম লিখুন..." oninput="searchChannels()">
+
+    <div class="cat-row">
+        <div class="cat-btn active" onclick="filterData('ALL', this)">All Live</div>
+        <div class="cat-btn" onclick="filterData('FAV', this)">⭐ Favorite</div>
+        <div class="cat-btn" onclick="filterData('SPORTS', this)">Sports</div>
+        <div class="cat-btn" onclick="filterData('BANGLA', this)">Bangla</div>
+    </div>
+
+    <div class="grid" id="channelGrid">
+        </div>
+</div>
+
 <script>
-const M3U_URL = "https://raw.githubusercontent.com/soheltanver85-a11y/Live-tv2/main/Live-tv2";
-const video = document.getElementById("player");
-const channelGrid = document.getElementById("channelGrid");
+const M3U = "https://raw.githubusercontent.com/soheltanver85-a11y/Live-tv2/main/Live-tv2";
+const grid = document.getElementById('channelGrid');
+const player = document.getElementById('tvPlayer');
 
-// LocalStorage থেকে ফেভারিট লিস্ট আনা
-let favorites = JSON.parse(localStorage.getItem("my_fav_channels")) || [];
 let allChannels = [];
+let favs = JSON.parse(localStorage.getItem('fav_list')) || [];
+let currentFilter = 'ALL';
 
-async function loadChannels() {
+async function init() {
     try {
-        const res = await fetch(M3U_URL);
-        const data = await res.text();
-        parseM3U(data);
-    } catch (e) { console.error("Error", e); }
+        const res = await fetch(M3U);
+        const text = await res.text();
+        parseM3U(text);
+    } catch (e) { console.log(e); }
 }
 
 function parseM3U(data) {
@@ -112,63 +195,86 @@ function parseM3U(data) {
     let item = {};
     lines.forEach(line => {
         if (line.startsWith('#EXTINF')) {
-            item.name = line.split(',')[1] || "TV Channel";
-            item.logo = line.match(/tvg-logo="(.*?)"/)?.[1] || "https://via.placeholder.com/100";
+            item.name = line.split(',')[1] || "Channel";
+            item.logo = line.match(/tvg-logo="(.*?)"/)?.[1] || "";
+            item.group = line.match(/group-title="(.*?)"/)?.[1] || "General";
         } else if (line.startsWith('http')) {
             item.url = line.trim();
             allChannels.push({...item});
             item = {};
         }
     });
-    renderChannels();
+    render(allChannels);
 }
 
-function renderChannels() {
-    channelGrid.innerHTML = allChannels.map(ch => {
-        const isFav = favorites.includes(ch.url) ? 'is-fav' : '';
+function render(data) {
+    grid.innerHTML = data.map(ch => {
+        const isFav = favs.includes(ch.url);
         return `
-            <div class="channel-card ${isFav}" data-url="${ch.url}">
-                <div class="fav-heart" onclick="toggleFavorite(event, '${ch.url}')">
+            <div class="card ${isFav ? 'is-fav' : ''}" data-group="${ch.group}">
+                <div class="love-icon" onclick="toggleFav(event, '${ch.url}')">
                     <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
                 </div>
-                <div class="logo-box" onclick="playChannel('${ch.url}')">
-                    <img src="${ch.logo}" alt="">
+                <div onclick="play('${ch.url}')">
+                    <div class="logo-area"><img src="${ch.logo}" onerror="this.src='https://via.placeholder.com/100?text=TV'"></div>
+                    <div class="ch-title">${ch.name}</div>
                 </div>
-                <div class="info" onclick="playChannel('${ch.url}')">${ch.name}</div>
             </div>
         `;
     }).join('');
 }
 
-function toggleFavorite(event, url) {
-    event.stopPropagation(); // যাতে কার্ডে ক্লিক লেগে ভিডিও প্লে না হয়ে যায়
-    const card = event.currentTarget.closest('.channel-card');
-    
-    if (favorites.includes(url)) {
-        favorites = favorites.filter(u => u !== url); // রিমুভ
-        card.classList.remove('is-fav');
-    } else {
-        favorites.push(url); // অ্যাড
-        card.classList.add('is-fav');
-    }
-    
-    localStorage.setItem("my_fav_channels", JSON.stringify(favorites));
-}
-
-function playChannel(url) {
+function play(url) {
     if (Hls.isSupported()) {
         const hls = new Hls();
         hls.loadSource(url);
-        hls.attachMedia(video);
-        hls.on(Hls.Events.MANIFEST_PARSED, () => video.play());
+        hls.attachMedia(player);
+        hls.on(Hls.Events.MANIFEST_PARSED, () => player.play());
     } else {
-        video.src = url;
-        video.play();
+        player.src = url;
+        player.play();
     }
     window.scrollTo({top: 0, behavior: 'smooth'});
 }
 
-loadChannels();
+function toggleFav(e, url) {
+    e.stopPropagation();
+    if (favs.includes(url)) {
+        favs = favs.filter(u => u !== url);
+    } else {
+        favs.push(url);
+    }
+    localStorage.setItem('fav_list', JSON.stringify(favs));
+    
+    // ক্যাটাগরি অনুযায়ী রি-রেন্ডার
+    if(currentFilter === 'FAV') {
+        const favList = allChannels.filter(c => favs.includes(c.url));
+        render(favList);
+    } else {
+        render(allChannels);
+    }
+}
+
+function filterData(type, el) {
+    currentFilter = type;
+    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+
+    let filtered = [];
+    if (type === 'ALL') filtered = allChannels;
+    else if (type === 'FAV') filtered = allChannels.filter(c => favs.includes(c.url));
+    else filtered = allChannels.filter(c => c.group.toUpperCase().includes(type));
+    
+    render(filtered);
+}
+
+function searchChannels() {
+    const q = document.getElementById('search').value.toLowerCase();
+    const filtered = allChannels.filter(c => c.name.toLowerCase().includes(q));
+    render(filtered);
+}
+
+init();
 </script>
 
 </body>
