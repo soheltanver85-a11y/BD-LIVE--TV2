@@ -2,8 +2,8 @@
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RoarZone TV | Ultimate Sticky Pro</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>RoarZone TV | Sticky Fix</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
@@ -11,83 +11,84 @@
     <style>
         :root { --primary: #ff2a2a; --bg: #050505; --card-bg: #1a1a1a; --text: #fff; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
-        body { background-color: var(--bg); color: var(--text); }
+        
+        body, html { 
+            background-color: var(--bg); 
+            color: var(--text);
+            height: 100%;
+        }
 
-        /* ১. ভিডিও প্লেয়ার (ফিক্সড টপ) */
+        /* ১. মেইন ফিক্সড কন্টেইনার (এটি নড়বে না) */
+        .header-fixed-part {
+            position: sticky;
+            top: 0;
+            z-index: 2000;
+            background: var(--bg);
+            width: 100%;
+        }
+
+        /* ভিডিও প্লেয়ার */
         .video-box { 
             width: 100%; 
-            position: sticky; 
-            top: 0; 
-            z-index: 1001; 
             background: #000; 
             border-bottom: 2px solid var(--primary);
         }
         video { width: 100%; aspect-ratio: 16/9; display: block; }
 
-        /* ২. স্টিকি কন্টেইনার (ক্যাটাগরি ও নেভিগেশন) */
-        .sticky-header {
-            position: sticky;
-            top: 56.25vw; /* ভিডিওর উচ্চতা অনুযায়ী */
+        /* নেভিগেশন ও ক্যাটাগরি (এটিও স্টিকি থাকবে) */
+        .controls-area {
             background: var(--bg);
-            z-index: 1000;
-            padding: 10px 10px 0 10px;
-            box-shadow: 0 10px 15px rgba(0,0,0,0.6);
+            padding: 10px 10px 5px 10px;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.5);
         }
-
-        @media (min-width: 768px) {
-            .sticky-header { top: 432px; } /* ডেস্কটপের জন্য */
-        }
-
-        .container { padding: 10px; }
 
         /* হেডার ও সার্চ */
-        .top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; position: relative; height: 35px; }
+        .top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; position: relative; height: 35px; }
         .logo-text { font-size: 14px; font-weight: 700; color: var(--primary); }
-        
         .nav-right { display: flex; align-items: center; gap: 5px; }
-        .btn-mini { padding: 5px 10px; border-radius: 6px; border: none; font-size: 9px; font-weight: 700; color: #fff; cursor: pointer; text-transform: uppercase; }
+        .btn-mini { padding: 4px 8px; border-radius: 4px; border: none; font-size: 9px; font-weight: 700; color: #fff; cursor: pointer; }
         .btn-m { background: #ff4141; } .btn-t { background: #27ae60; }
-        
-        .search-trigger { background: #333; width: 32px; height: 32px; border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; }
-        .search-trigger svg { width: 16px; fill: #fff; }
+        .search-trigger { background: #333; width: 30px; height: 30px; border-radius: 4px; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; }
+        .search-trigger svg { width: 14px; fill: #fff; }
 
+        /* সার্চ ওভারলে */
         .search-overlay {
             position: absolute; top: 0; right: -110%; width: 100%; height: 100%;
             background: var(--bg); display: flex; align-items: center; 
-            transition: 0.3s ease; z-index: 15;
+            transition: 0.3s ease; z-index: 20;
         }
         .search-overlay.active { right: 0; }
-        .search-input { width: 85%; background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 6px 15px; border-radius: 20px; outline: none; font-size: 12px; }
-        .close-search { width: 15%; background: transparent; border: none; color: var(--primary); font-size: 20px; cursor: pointer; }
+        .search-input { width: 85%; background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 5px 12px; border-radius: 20px; outline: none; font-size: 12px; }
 
-        /* রিসেন্টলি প্লেড */
-        #recent-section { margin-bottom: 12px; display: none; }
-        .section-label { font-size: 9px; color: #777; margin-bottom: 6px; font-weight: 600; text-transform: uppercase; }
-        .recent-list { display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; }
+        /* রিসেন্টলি প্লেড - অতি ক্ষুদ্র */
+        #recent-section { margin-bottom: 10px; display: none; }
+        .recent-list { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; }
         .recent-list::-webkit-scrollbar { display: none; }
-        .recent-item { flex-shrink: 0; width: 48px; text-align: center; }
-        .recent-circle { width: 42px; height: 42px; border-radius: 50%; background: #fff; padding: 4px; border: 1.5px solid #333; margin-bottom: 3px; overflow: hidden; }
+        .recent-item { flex-shrink: 0; width: 42px; text-align: center; }
+        .recent-circle { width: 38px; height: 38px; border-radius: 50%; background: #fff; padding: 4px; border: 1px solid #333; margin-bottom: 2px; overflow: hidden; }
         .recent-circle img { width: 100%; height: 100%; object-fit: contain; }
-        .recent-item span { font-size: 8px; color: #bbb; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .recent-item span { font-size: 7px; color: #bbb; display: block; overflow: hidden; white-space: nowrap; }
 
         /* ক্যাটাগরি পিলস */
-        .cat-row { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 12px; scrollbar-width: none; }
-        .cat-pill { padding: 6px 14px; background: #1a1a1a; border-radius: 20px; white-space: nowrap; font-size: 11px; border: 1px solid #333; cursor: pointer; color: #aaa; }
+        .cat-row { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; }
+        .cat-pill { padding: 5px 12px; background: #1a1a1a; border-radius: 15px; white-space: nowrap; font-size: 10px; border: 1px solid #333; cursor: pointer; color: #aaa; }
         .cat-pill.active { background: var(--primary); color: #fff; border-color: var(--primary); }
 
-        /* ৩. চ্যানেল গ্রিড (স্ক্রল হবে) */
-        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding-bottom: 20px; }
-        .card { background: var(--card-bg); border-radius: 12px; overflow: hidden; position: relative; border: 1px solid #222; }
-        .logo-area { height: 85px; background: #fff; display: flex; align-items: center; justify-content: center; padding: 12px; }
-        .logo-area img { max-height: 100%; max-width: 100%; object-fit: contain; }
-        .ch-info { padding: 8px; text-align: center; font-size: 11px; font-weight: 600; color: #ddd; }
-
-        .fav-heart { 
-            position: absolute; top: 6px; right: 6px; background: rgba(0,0,0,0.5); 
-            width: 28px; height: 28px; border-radius: 50%; display: flex; 
-            align-items: center; justify-content: center; z-index: 10;
+        /* ২. স্ক্রলযোগ্য চ্যানেল গ্রিড */
+        .main-content {
+            padding: 10px;
+            position: relative;
+            z-index: 10;
         }
-        .fav-heart svg { width: 15px; fill: rgba(255,255,255,0.3); }
+        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .card { background: var(--card-bg); border-radius: 10px; overflow: hidden; position: relative; border: 1px solid #222; }
+        .logo-area { height: 75px; background: #fff; display: flex; align-items: center; justify-content: center; padding: 10px; }
+        .logo-area img { max-height: 100%; max-width: 100%; object-fit: contain; }
+        .ch-info { padding: 8px; text-align: center; font-size: 10px; font-weight: 600; color: #ddd; }
+
+        /* ফেভারিট হার্ট */
+        .fav-heart { position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.5); width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .fav-heart svg { width: 12px; fill: rgba(255,255,255,0.3); }
         .card.is-fav .fav-heart svg { fill: var(--primary); }
 
         @media (min-width: 768px) { .grid { grid-template-columns: repeat(6, 1fr); } }
@@ -95,47 +96,48 @@
 </head>
 <body>
 
-<div class="video-box">
-    <video id="player" controls autoplay playsinline poster="https://via.placeholder.com/640x360/000/fff?text=RoarZone+TV"></video>
+<div class="header-fixed-part">
+    <div class="video-box">
+        <video id="player" controls autoplay playsinline poster="https://via.placeholder.com/640x360/000/fff?text=RoarZone+TV"></video>
+    </div>
+
+    <div class="controls-area">
+        <div class="top-nav">
+            <div class="logo-text">ROARZONE</div>
+            <div class="nav-right">
+                <button class="btn-mini btn-m">Mob</button>
+                <button class="btn-mini btn-t">TV</button>
+                <button class="search-trigger" onclick="toggleSearch(true)">
+                    <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                </button>
+            </div>
+            <div class="search-overlay" id="searchOverlay">
+                <input type="text" class="search-input" id="searchInput" placeholder="Search..." oninput="searchChannels()">
+                <button style="background:none; border:none; color:red; margin-left:10px" onclick="toggleSearch(false)">×</button>
+            </div>
+        </div>
+
+        <div id="recent-section">
+            <div class="recent-list" id="recentContainer"></div>
+        </div>
+
+        <div class="cat-row">
+            <div class="cat-pill active" onclick="filterData('ALL', this)">All</div>
+            <div class="cat-pill" onclick="filterData('FAVORITE', this)">⭐ Fav</div>
+            <div class="cat-pill" onclick="filterData('SPORTS', this)">Sports</div>
+            <div class="cat-pill" onclick="filterData('BANGLA', this)">Bangla</div>
+        </div>
+    </div>
 </div>
 
-<div class="sticky-header">
-    <div class="top-nav">
-        <div class="logo-text">ROARZONE TV</div>
-        <div class="nav-right">
-            <button class="btn-mini btn-m">Mobile</button>
-            <button class="btn-mini btn-t">TV App</button>
-            <button class="search-trigger" onclick="toggleSearch(true)">
-                <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-            </button>
-        </div>
-        <div class="search-overlay" id="searchOverlay">
-            <input type="text" class="search-input" id="searchInput" placeholder="Search Channels..." oninput="searchChannels()">
-            <button class="close-search" onclick="toggleSearch(false)">×</button>
-        </div>
-    </div>
-
-    <div id="recent-section">
-        <span class="section-label">Recently Played</span>
-        <div class="recent-list" id="recentContainer"></div>
-    </div>
-
-    <div class="cat-row">
-        <div class="cat-pill active" onclick="filterData('ALL', this)">All</div>
-        <div class="cat-pill" onclick="filterData('FAVORITE', this)">⭐ Fav</div>
-        <div class="cat-pill" onclick="filterData('SPORTS', this)">Sports</div>
-        <div class="cat-pill" onclick="filterData('BANGLA', this)">Bangla</div>
-    </div>
-</div>
-
-<div class="container">
+<div class="main-content">
     <div class="grid" id="mainGrid"></div>
 </div>
 
 <script>
     const M3U_URL = "https://raw.githubusercontent.com/soheltanver85-a11y/Live-tv2/main/Live-tv2";
-    let allChannels = [], favs = JSON.parse(localStorage.getItem('fav_v8')) || [];
-    let recents = JSON.parse(localStorage.getItem('recent_v8')) || [];
+    let allChannels = [], favs = JSON.parse(localStorage.getItem('fav_v9')) || [];
+    let recents = JSON.parse(localStorage.getItem('recent_v9')) || [];
     let currentFilter = 'ALL';
 
     const grid = document.getElementById('mainGrid');
@@ -199,7 +201,7 @@
         } else { player.src = url; player.play(); }
 
         recents = [url, ...recents.filter(u => u !== url)].slice(0, 10);
-        localStorage.setItem('recent_v8', JSON.stringify(recents));
+        localStorage.setItem('recent_v9', JSON.stringify(recents));
         renderRecents();
         window.scrollTo({top: 0, behavior: 'smooth'});
     }
@@ -207,7 +209,7 @@
     function toggleFav(e, url) {
         e.stopPropagation();
         favs.includes(url) ? favs = favs.filter(u => u !== url) : favs.push(url);
-        localStorage.setItem('fav_v8', JSON.stringify(favs));
+        localStorage.setItem('fav_v9', JSON.stringify(favs));
         filterData(currentFilter, document.querySelector('.cat-pill.active'));
     }
 
