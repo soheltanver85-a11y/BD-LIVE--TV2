@@ -3,173 +3,239 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pro Stream TV</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>Universal Premium TV</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <style>
-        :root { --primary: #ff2a2a; --bg: #0a0a0a; --card-bg: #1a1a1a; --text: #fff; }
-        * { margin:0; padding:0; box-sizing:border-box; font-family:'Inter', sans-serif; }
-        body { background: var(--bg); color: var(--text); overflow-x: hidden; }
+        :root {
+            --primary: #e50914; /* Netflix Red */
+            --bg: #050505;
+            --glass: rgba(255, 255, 255, 0.05);
+            --text: #ffffff;
+        }
 
-        /* ১. ভিডিও প্লেয়ার ও অ্যানিমেশন */
-        .video-box { width: 100%; position: sticky; top: 0; z-index: 1000; background: #000; }
-        video { width: 100%; aspect-ratio: 16/9; display: block; cursor: pointer; transition: 0.3s; }
-        
-        /* ডাবল ট্যাপ অ্যানিমেশন */
-        .seek-msg { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.6); padding: 10px 20px; border-radius: 50px; display: none; pointer-events: none; z-index: 1001; }
-        #seek-left { left: 10%; } #seek-right { right: 10%; }
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            overflow-x: hidden;
+        }
 
-        .container { padding: 15px; }
-        .search-box { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid #333; background: #1f1f1f; color: white; margin-bottom: 15px; outline: none; }
+        /* ১. ভিডিও প্লেয়ার - আধুনিক গ্লাস ইফেক্ট */
+        .video-wrapper {
+            width: 100%;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid var(--primary);
+        }
+        video { width: 100%; aspect-ratio: 16/9; display: block; }
 
-        /* ২. মাইক্রো-ইন্টারঅ্যাকশন বাটন */
-        .cat-row { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 15px; scrollbar-width: none; }
-        .cat-btn { padding: 10px 22px; background: #222; border-radius: 25px; white-space: nowrap; font-size: 14px; cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); border: 1px solid #333; }
-        .cat-btn:active { transform: scale(0.9); }
-        .cat-btn.active { background: var(--primary); border-color: var(--primary); font-weight: 700; box-shadow: 0 4px 12px rgba(255,42,42,0.4); }
+        .content { padding: 15px; }
 
-        /* ৩. প্রিমিয়াম কার্ড ডিজাইন */
+        /* ২. আধুনিক সার্চ বার */
+        .search-container {
+            background: var(--glass);
+            border-radius: 30px;
+            padding: 5px 20px;
+            display: flex;
+            align-items: center;
+            border: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 20px;
+        }
+        .search-container input {
+            background: transparent;
+            border: none;
+            color: white;
+            padding: 12px;
+            width: 100%;
+            outline: none;
+            font-size: 15px;
+        }
+
+        /* ৩. রিসেন্টলি প্লেড সেকশন */
+        #recent-section { margin-bottom: 20px; display: none; }
+        .section-title { font-size: 18px; font-weight: 700; margin-bottom: 12px; color: var(--primary); }
+
+        /* ৪. ক্যাটাগরি পিলস - আধুনিক লুক */
+        .nav-scroller {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            padding-bottom: 15px;
+            scrollbar-width: none;
+        }
+        .nav-pill {
+            padding: 10px 25px;
+            background: var(--glass);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 25px;
+            white-space: nowrap;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .nav-pill.active { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 0 15px rgba(229, 9, 20, 0.4); }
+
+        /* ৫. চ্যানেল গ্রিড এবং কার্ড */
         .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
-        .card { background: var(--card-bg); border-radius: 18px; overflow: hidden; position: relative; transition: 0.3s ease; border: 1px solid rgba(255,255,255,0.05); }
-        .card:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+        .card {
+            background: var(--glass);
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+        }
+        .card:hover { transform: translateY(-8px) scale(1.02); border-color: var(--primary); }
         
-        .logo-area { height: 100px; background: #fff; display: flex; align-items: center; justify-content: center; padding: 15px; transition: 0.3s; }
-        .logo-area img { max-height: 100%; max-width: 100%; object-fit: contain; transition: 0.5s; }
-        .card:hover .logo-area img { transform: scale(1.1); }
+        .logo-box { height: 110px; background: white; padding: 15px; display: flex; align-items: center; justify-content: center; }
+        .logo-box img { max-width: 100%; max-height: 100%; object-fit: contain; }
 
-        .ch-title { padding: 12px; text-align: center; font-size: 13px; font-weight: 600; }
+        .name-box { padding: 12px; text-align: center; font-size: 13px; font-weight: 600; }
 
-        .love-icon { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.5); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 10; backdrop-filter: blur(5px); transition: 0.3s; }
-        .love-icon svg { width: 20px; fill: #aaa; transition: 0.3s; }
-        .card.is-fav .love-icon svg { fill: #ff2a2a; filter: drop-shadow(0 0 5px red); }
+        /* ফেভারিট হার্ট */
+        .fav-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.5);
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+        }
+        .card.is-fav .fav-btn svg { fill: var(--primary); }
 
-        @media (min-width: 768px) { .grid { grid-template-columns: repeat(4, 1fr); } }
+        @media (min-width: 768px) { .grid { grid-template-columns: repeat(5, 1fr); } }
     </style>
 </head>
 <body>
 
-<div class="video-box" id="vBox">
-    <div id="seek-left" class="seek-msg">⏪ 10s</div>
-    <div id="seek-right" class="seek-msg">10s ⏩</div>
-    <video id="tvPlayer" controls autoplay playsinline></video>
+<div class="video-wrapper">
+    <video id="mainPlayer" controls autoplay playsinline></video>
 </div>
 
-<div class="container">
-    <input type="text" class="search-box" id="search" placeholder="পছন্দের চ্যানেল খুঁজুন..." oninput="searchChannels()">
-
-    <div class="cat-row">
-        <div class="cat-btn active" onclick="filterData('ALL', this)">All Live</div>
-        <div class="cat-btn" onclick="filterData('FAVORITE', this)">⭐ Favorite</div>
-        <div class="cat-btn" onclick="filterData('SPORTS', this)">Sports</div>
-        <div class="cat-btn" onclick="filterData('BANGLA', this)">Bangla</div>
+<div class="content">
+    <div id="recent-section">
+        <div class="section-title">Recently Played</div>
+        <div class="nav-scroller" id="recentContainer"></div>
     </div>
 
-    <div class="grid" id="channelGrid"></div>
+    <div class="search-container">
+        <input type="text" placeholder="Search for channels, movies..." oninput="doSearch(this.value)">
+    </div>
+
+    <div class="nav-scroller" id="catNav">
+        <div class="nav-pill active" onclick="filterData('ALL', this)">All Channels</div>
+        <div class="nav-pill" onclick="filterData('FAVORITE', this)">Favorites</div>
+        <div class="nav-pill" onclick="filterData('SPORTS', this)">Sports</div>
+        <div class="nav-pill" onclick="filterData('BANGLA', this)">Bangla</div>
+    </div>
+
+    <div class="grid" id="mainGrid"></div>
 </div>
 
 <script>
-const M3U = "https://raw.githubusercontent.com/soheltanver85-a11y/Live-tv2/main/Live-tv2";
-const grid = document.getElementById('channelGrid');
-const player = document.getElementById('tvPlayer');
-let allChannels = [], favs = JSON.parse(localStorage.getItem('my_fav_list')) || [], currentFilter = 'ALL';
+    const M3U = "https://raw.githubusercontent.com/soheltanver85-a11y/Live-tv2/main/Live-tv2";
+    let allData = [], favorites = JSON.parse(localStorage.getItem('fav_v2')) || [];
+    let recents = JSON.parse(localStorage.getItem('recent_v2')) || [];
 
-async function init() {
-    try {
+    async function loadData() {
         const res = await fetch(M3U);
         const text = await res.text();
-        parseM3U(text);
-    } catch (e) { console.error(e); }
-}
-
-function parseM3U(data) {
-    const lines = data.split('\n');
-    let item = {};
-    lines.forEach(line => {
-        if (line.startsWith('#EXTINF')) {
-            item.name = line.split(',')[1]?.trim() || "Channel";
-            item.logo = line.match(/tvg-logo="(.*?)"/)?.[1] || "";
-            item.group = line.match(/group-title="(.*?)"/)?.[1] || "General";
-        } else if (line.startsWith('http')) {
-            item.url = line.trim();
-            allChannels.push({...item});
-            item = {};
-        }
-    });
-    render(allChannels);
-}
-
-function render(data) {
-    grid.innerHTML = data.map(ch => `
-        <div class="card ${favs.includes(ch.url)?'is-fav':''}">
-            <div class="love-icon" onclick="toggleFav(event, '${ch.url}')">
-                <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-            </div>
-            <div onclick="play('${ch.url}')" style="cursor:pointer">
-                <div class="logo-area"><img src="${ch.logo}" onerror="this.src='https://via.placeholder.com/100?text=TV'"></div>
-                <div class="ch-title">${ch.name}</div>
-            </div>
-        </div>
-    `).join('');
-}
-
-// ৪. ডাবল ট্যাপ ফিচার (Double Tap to Seek)
-let lastTap = 0;
-player.addEventListener('click', function (e) {
-    let now = new Date().getTime();
-    let timesince = now - lastTap;
-    if ((timesince < 300) && (timesince > 0)) {
-        const rect = player.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        if (x < rect.width / 2) {
-            player.currentTime -= 10;
-            showSeek('seek-left');
-        } else {
-            player.currentTime += 10;
-            showSeek('seek-right');
-        }
+        const lines = text.split('\n');
+        let obj = {};
+        lines.forEach(l => {
+            if(l.startsWith('#EXTINF')) {
+                obj.name = l.split(',')[1]?.trim();
+                obj.logo = l.match(/tvg-logo="(.*?)"/)?.[1];
+                obj.group = l.match(/group-title="(.*?)"/)?.[1];
+            } else if(l.startsWith('http')) {
+                obj.url = l.trim();
+                allData.push({...obj});
+                obj = {};
+            }
+        });
+        renderGrid(allData);
+        renderRecents();
     }
-    lastTap = now;
-});
 
-function showSeek(id) {
-    const el = document.getElementById(id);
-    el.style.display = 'block';
-    setTimeout(() => { el.style.display = 'none'; }, 600);
-}
+    function renderGrid(data) {
+        const grid = document.getElementById('mainGrid');
+        grid.innerHTML = data.map(ch => `
+            <div class="card ${favorites.includes(ch.url) ? 'is-fav' : ''}">
+                <div class="fav-btn" onclick="toggleFav(event, '${ch.url}')">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                </div>
+                <div onclick="playChannel('${ch.url}', '${ch.name}')">
+                    <div class="logo-box"><img src="${ch.logo}" onerror="this.src='https://via.placeholder.com/100'"></div>
+                    <div class="name-box">${ch.name}</div>
+                </div>
+            </div>
+        `).join('');
+    }
 
-function play(url) {
-    if (Hls.isSupported()) {
-        const hls = new Hls();
-        hls.loadSource(url);
-        hls.attachMedia(player);
-        hls.on(Hls.Events.MANIFEST_PARSED, () => player.play());
-    } else { player.src = url; player.play(); }
-    window.scrollTo({top: 0, behavior: 'smooth'});
-}
+    function playChannel(url, name) {
+        const video = document.getElementById('mainPlayer');
+        if (Hls.isSupported()) {
+            const hls = new Hls();
+            hls.loadSource(url);
+            hls.attachMedia(video);
+            hls.on(Hls.Events.MANIFEST_PARSED, () => video.play());
+        } else { video.src = url; video.play(); }
 
-function toggleFav(e, url) {
-    e.stopPropagation();
-    favs.includes(url) ? favs = favs.filter(u => u !== url) : favs.push(url);
-    localStorage.setItem('my_fav_list', JSON.stringify(favs));
-    render(currentFilter === 'FAVORITE' ? allChannels.filter(c => favs.includes(c.url)) : allChannels);
-}
+        // রিসেন্টলি প্লেড এ অ্যাড করা
+        if(!recents.includes(url)) {
+            recents.unshift(url);
+            if(recents.length > 10) recents.pop();
+            localStorage.setItem('recent_v2', JSON.stringify(recents));
+            renderRecents();
+        }
+        window.scrollTo({top: 0, behavior: 'smooth'});
+    }
 
-function filterData(type, el) {
-    currentFilter = type;
-    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
-    el.classList.add('active');
-    let filtered = type === 'ALL' ? allChannels : 
-                   type === 'FAVORITE' ? allChannels.filter(c => favs.includes(c.url)) : 
-                   allChannels.filter(c => (c.group+c.name).toUpperCase().includes(type.toUpperCase()));
-    render(filtered);
-}
+    function renderRecents() {
+        const container = document.getElementById('recentContainer');
+        const section = document.getElementById('recent-section');
+        if(recents.length === 0) return;
+        section.style.display = 'block';
+        
+        const recentChannels = allData.filter(c => recents.includes(c.url));
+        container.innerHTML = recentChannels.map(ch => `
+            <div class="nav-pill" onclick="playChannel('${ch.url}', '${ch.name}')">${ch.name}</div>
+        `).join('');
+    }
 
-function searchChannels() {
-    const q = document.getElementById('search').value.toLowerCase();
-    render(allChannels.filter(c => c.name.toLowerCase().includes(q)));
-}
+    function toggleFav(e, url) {
+        e.stopPropagation();
+        if(favorites.includes(url)) favorites = favorites.filter(u => u !== url);
+        else favorites.push(url);
+        localStorage.setItem('fav_v2', JSON.stringify(favorites));
+        renderGrid(allData);
+    }
 
-init();
+    function filterData(type, el) {
+        document.querySelectorAll('.nav-pill').forEach(b => b.classList.remove('active'));
+        el.classList.add('active');
+        if(type === 'ALL') renderGrid(allData);
+        else if(type === 'FAVORITE') renderGrid(allData.filter(c => favorites.includes(c.url)));
+        else renderGrid(allData.filter(c => (c.group+c.name).toUpperCase().includes(type)));
+    }
+
+    function doSearch(q) {
+        const filtered = allData.filter(c => c.name.toLowerCase().includes(q.toLowerCase()));
+        renderGrid(filtered);
+    }
+
+    loadData();
 </script>
 </body>
 </html>
