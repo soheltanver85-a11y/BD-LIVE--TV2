@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RoarZone TV | Recent Icons Pro</title>
+    <title>RoarZone TV | Pull Refresh Fixed</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
@@ -12,21 +12,20 @@
         :root { --primary: #ff2a2a; --bg: #050505; --card-bg: #1a1a1a; --text: #fff; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
         
-        body, html { 
+        body { 
             background-color: var(--bg); 
             color: var(--text);
-            height: 100%;
-            overflow: hidden;
+            overflow-x: hidden;
+            overscroll-behavior-y: contain; /* পুল টু রিফ্রেশ কন্ট্রোল করার জন্য */
         }
 
-        /* উপরের ফিক্সড অংশ */
-        .fixed-top-section {
-            position: fixed;
+        /* উপরের অংশ যা স্ক্রিন স্ক্রল করলেও আটকে থাকবে */
+        .fixed-top-container {
+            position: sticky;
             top: 0;
-            left: 0;
-            width: 100%;
-            z-index: 100;
+            z-index: 2000;
             background: var(--bg);
+            width: 100%;
         }
 
         .video-box { background: #000; border-bottom: 2px solid var(--primary); }
@@ -34,29 +33,16 @@
 
         .controls-area { padding: 8px 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
 
-        /* হেডার: যেখানে লেখা ছিল সেখানে এখন রিসেন্ট আইকন */
         .top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; position: relative; height: 42px; gap: 10px; }
         
-        /* রিসেন্ট লিস্ট ডিজাইন (লেখার বদলে এটি আসবে) */
+        /* রিসেন্ট লিস্ট */
         #recent-header-list { 
-            display: flex; 
-            gap: 8px; 
-            overflow-x: auto; 
-            scrollbar-width: none; 
-            flex-grow: 1; 
-            align-items: center;
+            display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; flex-grow: 1; align-items: center;
         }
         #recent-header-list::-webkit-scrollbar { display: none; }
         
         .recent-mini-circle { 
-            width: 34px; height: 34px; 
-            border-radius: 50%; 
-            background: #fff; 
-            padding: 4px; 
-            border: 1.5px solid #333; 
-            flex-shrink: 0; 
-            cursor: pointer;
-            overflow: hidden;
+            width: 34px; height: 34px; border-radius: 50%; background: #fff; padding: 4px; border: 1.5px solid #333; flex-shrink: 0; cursor: pointer; overflow: hidden;
         }
         .recent-mini-circle img { width: 100%; height: 100%; object-fit: contain; }
 
@@ -75,20 +61,16 @@
         .search-input { width: 85%; background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 6px 15px; border-radius: 20px; outline: none; }
 
         .cat-row { display: flex; gap: 6px; overflow-x: auto; padding: 5px 0; scrollbar-width: none; }
-        .cat-row::-webkit-scrollbar { display: none; }
         .cat-pill { padding: 5px 12px; background: #1a1a1a; border-radius: 15px; white-space: nowrap; font-size: 10px; border: 1px solid #333; color: #aaa; cursor: pointer; }
         .cat-pill.active { background: var(--primary); color: #fff; border-color: var(--primary); }
 
-        /* নিচের স্ক্রলযোগ্য চ্যানেল লিস্ট */
-        .scrollable-content {
-            margin-top: calc(56.25vw + 105px); 
-            height: calc(100vh - (56.25vw + 105px));
-            overflow-y: auto;
+        /* গ্রিড কন্টেইনার */
+        .main-grid-container {
             padding: 10px;
-            -webkit-overflow-scrolling: touch;
+            min-height: 100vh; /* স্ক্রল বজায় রাখার জন্য */
         }
 
-        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding-bottom: 60px; }
+        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding-bottom: 100px; }
         .card { background: var(--card-bg); border-radius: 10px; overflow: hidden; position: relative; border: 1px solid #222; }
         .logo-area { height: 75px; background: #fff; display: flex; align-items: center; justify-content: center; padding: 10px; }
         .logo-area img { max-height: 100%; max-width: 100%; object-fit: contain; }
@@ -99,23 +81,20 @@
         .card.is-fav .fav-heart svg { fill: var(--primary); }
 
         @media (min-width: 768px) {
-            .scrollable-content { margin-top: 540px; height: calc(100vh - 540px); }
             .grid { grid-template-columns: repeat(6, 1fr); }
         }
     </style>
 </head>
 <body>
 
-<div class="fixed-top-section">
+<div class="fixed-top-container">
     <div class="video-box">
         <video id="player" controls autoplay playsinline poster="https://via.placeholder.com/640x360/000/fff?text=RoarZone+TV"></video>
     </div>
 
     <div class="controls-area">
         <div class="top-nav">
-            <div id="recent-header-list">
-                </div>
-
+            <div id="recent-header-list"></div>
             <div class="nav-right">
                 <button class="btn-mini btn-m">Mob</button>
                 <button class="btn-mini btn-t">TV</button>
@@ -123,10 +102,9 @@
                     <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
                 </button>
             </div>
-
             <div class="search-overlay" id="searchOverlay">
-                <input type="text" class="search-input" id="searchInput" placeholder="Search Channels..." oninput="searchChannels()">
-                <button style="background:none; border:none; color:var(--primary); margin-left:10px; font-weight:bold; font-size:20px;" onclick="toggleSearch(false)">×</button>
+                <input type="text" class="search-input" id="searchInput" placeholder="Search..." oninput="searchChannels()">
+                <button style="background:none; border:none; color:var(--primary); margin-left:10px; font-weight:bold;" onclick="toggleSearch(false)">×</button>
             </div>
         </div>
 
@@ -139,14 +117,14 @@
     </div>
 </div>
 
-<div class="scrollable-content">
+<div class="main-grid-container">
     <div class="grid" id="mainGrid"></div>
 </div>
 
 <script>
     const M3U_URL = "https://raw.githubusercontent.com/soheltanver85-a11y/Live-tv2/main/Live-tv2";
-    let allChannels = [], favs = JSON.parse(localStorage.getItem('fav_v11')) || [];
-    let recents = JSON.parse(localStorage.getItem('recent_v11')) || [];
+    let allChannels = [], favs = JSON.parse(localStorage.getItem('fav_v12')) || [];
+    let recents = JSON.parse(localStorage.getItem('recent_v12')) || [];
 
     const grid = document.getElementById('mainGrid');
     const player = document.getElementById('player');
@@ -208,22 +186,18 @@
             hls.on(Hls.Events.MANIFEST_PARSED, () => player.play());
         } else { player.src = url; player.play(); }
 
-        // রিসেন্ট লিস্ট আপডেট (সর্বশেষ ১০টি)
         recents = [url, ...recents.filter(u => u !== url)].slice(0, 10);
-        localStorage.setItem('recent_v11', JSON.stringify(recents));
+        localStorage.setItem('recent_v12', JSON.stringify(recents));
         renderRecentIcons();
+        window.scrollTo({top: 0, behavior: 'smooth'}); // ভিডিও প্লে করলে স্মুথলি উপরে যাবে
     }
 
     function renderRecentIcons() {
         const container = document.getElementById('recent-header-list');
-        if (recents.length === 0 || allChannels.length === 0) {
-            container.innerHTML = '<span style="font-size:10px; color:#555">No recent channels</span>';
-            return;
-        }
-        
+        if (recents.length === 0 || allChannels.length === 0) return;
         const recentData = recents.map(url => allChannels.find(c => c.url === url)).filter(Boolean);
         container.innerHTML = recentData.map(ch => `
-            <div class="recent-mini-circle" onclick="play('${ch.url}')" title="${ch.name}">
+            <div class="recent-mini-circle" onclick="play('${ch.url}')">
                 <img src="${ch.logo}" onerror="this.src='https://via.placeholder.com/50'">
             </div>
         `).join('');
@@ -232,7 +206,7 @@
     function toggleFav(e, url) {
         e.stopPropagation();
         favs.includes(url) ? favs = favs.filter(u => u !== url) : favs.push(url);
-        localStorage.setItem('fav_v11', JSON.stringify(favs));
+        localStorage.setItem('fav_v12', JSON.stringify(favs));
         render(allChannels);
     }
 
