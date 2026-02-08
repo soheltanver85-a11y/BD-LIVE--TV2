@@ -3,7 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RoarZone TV | Pull Refresh Fixed</title>
+    <meta name="theme-color" content="#ff2a2a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" id="pwa-manifest">
+
+    <title>RoarZone TV | PWA Pro</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
@@ -16,10 +21,10 @@
             background-color: var(--bg); 
             color: var(--text);
             overflow-x: hidden;
-            overscroll-behavior-y: contain; /* পুল টু রিফ্রেশ কন্ট্রোল করার জন্য */
+            overscroll-behavior-y: contain;
         }
 
-        /* উপরের অংশ যা স্ক্রিন স্ক্রল করলেও আটকে থাকবে */
+        /* স্টিকি টপ সেকশন */
         .fixed-top-container {
             position: sticky;
             top: 0;
@@ -32,24 +37,17 @@
         video { width: 100%; aspect-ratio: 16/9; display: block; }
 
         .controls-area { padding: 8px 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
-
         .top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; position: relative; height: 42px; gap: 10px; }
         
-        /* রিসেন্ট লিস্ট */
-        #recent-header-list { 
-            display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; flex-grow: 1; align-items: center;
-        }
+        /* রিসেন্ট আইকন লিস্ট */
+        #recent-header-list { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; flex-grow: 1; align-items: center; }
         #recent-header-list::-webkit-scrollbar { display: none; }
-        
-        .recent-mini-circle { 
-            width: 34px; height: 34px; border-radius: 50%; background: #fff; padding: 4px; border: 1.5px solid #333; flex-shrink: 0; cursor: pointer; overflow: hidden;
-        }
+        .recent-mini-circle { width: 34px; height: 34px; border-radius: 50%; background: #fff; padding: 4px; border: 1.5px solid #333; flex-shrink: 0; cursor: pointer; overflow: hidden; }
         .recent-mini-circle img { width: 100%; height: 100%; object-fit: contain; }
 
         .nav-right { display: flex; align-items: center; gap: 5px; flex-shrink: 0; }
         .btn-mini { padding: 4px 8px; border-radius: 4px; border: none; font-size: 9px; font-weight: 700; color: #fff; cursor: pointer; }
         .btn-m { background: #ff4141; } .btn-t { background: #27ae60; }
-        
         .search-trigger { background: #333; width: 34px; height: 34px; border-radius: 6px; display: flex; align-items: center; justify-content: center; border: none; }
         .search-trigger svg { width: 16px; fill: #fff; }
 
@@ -64,25 +62,17 @@
         .cat-pill { padding: 5px 12px; background: #1a1a1a; border-radius: 15px; white-space: nowrap; font-size: 10px; border: 1px solid #333; color: #aaa; cursor: pointer; }
         .cat-pill.active { background: var(--primary); color: #fff; border-color: var(--primary); }
 
-        /* গ্রিড কন্টেইনার */
-        .main-grid-container {
-            padding: 10px;
-            min-height: 100vh; /* স্ক্রল বজায় রাখার জন্য */
-        }
-
+        .main-grid-container { padding: 10px; min-height: 100vh; }
         .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding-bottom: 100px; }
         .card { background: var(--card-bg); border-radius: 10px; overflow: hidden; position: relative; border: 1px solid #222; }
         .logo-area { height: 75px; background: #fff; display: flex; align-items: center; justify-content: center; padding: 10px; }
         .logo-area img { max-height: 100%; max-width: 100%; object-fit: contain; }
         .ch-info { padding: 8px; text-align: center; font-size: 10px; font-weight: 600; }
-
         .fav-heart { position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.5); width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
         .fav-heart svg { width: 12px; fill: rgba(255,255,255,0.3); }
         .card.is-fav .fav-heart svg { fill: var(--primary); }
 
-        @media (min-width: 768px) {
-            .grid { grid-template-columns: repeat(6, 1fr); }
-        }
+        @media (min-width: 768px) { .grid { grid-template-columns: repeat(6, 1fr); } }
     </style>
 </head>
 <body>
@@ -122,9 +112,39 @@
 </div>
 
 <script>
+    // --- PWA SETUP ---
+    const manifest = {
+        "name": "RoarZone Live TV",
+        "short_name": "RoarZone",
+        "start_url": ".",
+        "display": "standalone",
+        "background_color": "#050505",
+        "theme_color": "#ff2a2a",
+        "icons": [{
+            "src": "https://via.placeholder.com/192/ff2a2a/ffffff?text=RZ",
+            "sizes": "192x192",
+            "type": "image/png"
+        }, {
+            "src": "https://via.placeholder.com/512/ff2a2a/ffffff?text=RoarZone",
+            "sizes": "512x512",
+            "type": "image/png"
+        }]
+    };
+    const stringManifest = JSON.stringify(manifest);
+    const blob = new Blob([stringManifest], {type: 'application/json'});
+    document.getElementById('pwa-manifest').setAttribute('href', URL.createObjectURL(blob));
+
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('data:text/javascript;base64,' + btoa('self.addEventListener("fetch", (event) => {});'))
+            .then(reg => console.log('PWA Ready!'), err => console.log('PWA Error'));
+        });
+    }
+
+    // --- MAIN APP LOGIC ---
     const M3U_URL = "https://raw.githubusercontent.com/soheltanver85-a11y/Live-tv2/main/Live-tv2";
-    let allChannels = [], favs = JSON.parse(localStorage.getItem('fav_v12')) || [];
-    let recents = JSON.parse(localStorage.getItem('recent_v12')) || [];
+    let allChannels = [], favs = JSON.parse(localStorage.getItem('fav_v13')) || [];
+    let recents = JSON.parse(localStorage.getItem('recent_v13')) || [];
 
     const grid = document.getElementById('mainGrid');
     const player = document.getElementById('player');
@@ -187,9 +207,9 @@
         } else { player.src = url; player.play(); }
 
         recents = [url, ...recents.filter(u => u !== url)].slice(0, 10);
-        localStorage.setItem('recent_v12', JSON.stringify(recents));
+        localStorage.setItem('recent_v13', JSON.stringify(recents));
         renderRecentIcons();
-        window.scrollTo({top: 0, behavior: 'smooth'}); // ভিডিও প্লে করলে স্মুথলি উপরে যাবে
+        window.scrollTo({top: 0, behavior: 'smooth'});
     }
 
     function renderRecentIcons() {
@@ -206,7 +226,7 @@
     function toggleFav(e, url) {
         e.stopPropagation();
         favs.includes(url) ? favs = favs.filter(u => u !== url) : favs.push(url);
-        localStorage.setItem('fav_v12', JSON.stringify(favs));
+        localStorage.setItem('fav_v13', JSON.stringify(favs));
         render(allChannels);
     }
 
