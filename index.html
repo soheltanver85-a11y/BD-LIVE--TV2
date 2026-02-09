@@ -4,19 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#050505">
-    <title>RoarZone TV | Dark Premium</title>
+    <title>Rivo TV | Premium Live</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     
     <style>
         :root { 
-            --primary: #00f2ff; /* লাল এর বদলে সায়ান (Cyan) করা হয়েছে */
-            --accent: #00f2ff; 
+            --primary: #00f2ff; /* Rivo TV Cyan */
+            --fire: #ff4500;    /* Fire Red-Orange */
             --bg: #050505; 
             --card-bg: #0f0f0f; 
             --text: #fff; 
-            --secondary-text: #aaa;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
@@ -29,96 +28,75 @@
             z-index: 2000;
             background: var(--bg);
             width: 100%;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.8);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.9);
         }
-        /* প্লেয়ারের নিচের লাল বর্ডার সরিয়ে সায়ান করা হয়েছে */
-        .video-box { background: #000; border-bottom: 2px solid var(--primary); }
+        .video-box { background: #000; border-bottom: 2.5px solid var(--primary); }
         video#player { width: 100%; aspect-ratio: 16/9; display: block; }
 
         .controls-area { padding: 8px 10px; }
         .top-nav { display: flex; justify-content: space-between; align-items: center; gap: 10px; height: 45px; }
         
+        .brand-name { font-size: 20px; font-weight: 700; color: var(--primary); letter-spacing: 1px; }
+
         #recent-header-list { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; flex-grow: 1; }
         .recent-mini-circle { width: 38px; height: 38px; border-radius: 50%; background: #1a1a1a; padding: 4px; border: 1.5px solid #333; flex-shrink: 0; cursor: pointer; }
-        .recent-mini-circle img { width: 100%; height: 100%; object-fit: contain; filter: brightness(0.9); }
+        .recent-mini-circle img { width: 100%; height: 100%; object-fit: contain; }
 
-        .cat-row { display: flex; gap: 8px; overflow-x: auto; padding: 10px 0; scrollbar-width: none; }
-        .cat-pill { padding: 6px 14px; background: #1a1a1a; border-radius: 20px; font-size: 11px; border: 1px solid #333; color: #aaa; cursor: pointer; white-space: nowrap; transition: 0.3s; }
-        
-        /* একটিভ বাটনের রঙ পরিবর্তন */
+        /* ক্যাটাগরি রো */
+        .cat-row { display: flex; gap: 10px; overflow-x: auto; padding: 12px 0; scrollbar-width: none; align-items: center; }
+        .cat-pill { padding: 7px 16px; background: #1a1a1a; border-radius: 20px; font-size: 12px; border: 1px solid #333; color: #aaa; cursor: pointer; white-space: nowrap; transition: 0.3s; }
         .cat-pill.active { background: rgba(0, 242, 255, 0.1); color: var(--primary); border-color: var(--primary); }
 
-        /* ডার্ক কার্ড ডিজাইন */
-        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 10px; padding-bottom: 60px; }
-        
-        .card { 
-            background: var(--card-bg); 
-            border-radius: 12px; 
-            overflow: hidden; 
-            position: relative; 
-            border: 1px solid #1a1a1a;
-            transition: transform 0.2s;
+        /* আগুনের মতো জ্বলজ্বলে ডাউনলোড বাটন */
+        .download-btn-fire {
+            background: linear-gradient(45deg, #ff4500, #ff8c00) !important;
+            color: white !important;
+            font-weight: 700 !important;
+            border: none !important;
+            box-shadow: 0 0 10px #ff4500;
+            animation: fire-burn 0.8s infinite alternate ease-in-out;
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
 
-        .preview-container { position: relative; }
+        @keyframes fire-burn {
+            0% { 
+                box-shadow: 0 0 8px #ff4500, 0 0 15px #ff8c00; 
+                transform: scale(1);
+            }
+            100% { 
+                box-shadow: 0 0 15px #ff0000, 0 0 30px #ff8c00, 0 0 40px #ff4500; 
+                transform: scale(1.05);
+            }
+        }
+
+        /* কার্ড ডিজাইন */
+        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 10px; padding-bottom: 80px; }
+        .card { background: var(--card-bg); border-radius: 12px; overflow: hidden; position: relative; border: 1px solid #1a1a1a; }
         
         .logo-area { 
-            height: 90px; 
-            background: radial-gradient(circle, #151515 0%, #050505 100%);
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            padding: 18px; 
-            cursor: pointer;
+            height: 95px; 
+            background: radial-gradient(circle, #1a1a1a 0%, #050505 100%);
+            display: flex; align-items: center; justify-content: center; padding: 15px; 
         }
-        .logo-area img { 
-            max-height: 100%; 
-            max-width: 100%; 
-            object-fit: contain; 
-            filter: drop-shadow(0px 4px 8px rgba(0,0,0,0.5));
-        }
+        .logo-area img { max-height: 100%; max-width: 100%; object-fit: contain; filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.6)); }
 
-        .inline-player { width: 100%; height: 90px; object-fit: cover; background: #000; display: none; cursor: pointer; }
+        .ch-info { display: flex; align-items: center; justify-content: center; padding: 12px 6px; background: #0d0d0d; border-top: 1px solid #1a1a1a; }
+        .ch-name { font-size: 11px; font-weight: 600; color: #eee; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        .preview-progress-container { position: absolute; bottom: 0; left: 0; width: 100%; height: 3px; background: rgba(255,255,255,0.05); display: none; z-index: 10; }
-        .preview-progress-bar { width: 0%; height: 100%; background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+        .mini-play-btn { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; background: var(--primary); border-radius: 50%; margin-left: 8px; }
+        .mini-play-btn svg { width: 8px; fill: #000; }
+        
+        .fav-heart { position: absolute; top: 8px; right: 8px; z-index: 20; background: rgba(0,0,0,0.5); width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .fav-heart svg { width: 14px; fill: rgba(255,255,255,0.4); }
+        .card.is-fav .fav-heart svg { fill: var(--primary); }
+
+        .inline-player { width: 100%; height: 95px; object-fit: cover; display: none; }
+        .preview-progress-container { position: absolute; bottom: 0; left: 0; width: 100%; height: 3px; background: rgba(255,255,255,0.05); display: none; }
+        .preview-progress-bar { width: 0%; height: 100%; background: var(--primary); }
 
         @keyframes progressAnim { from { width: 0%; } to { width: 100%; } }
-
-        .ch-info { 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            padding: 12px 6px; 
-            background: #0d0d0d; 
-            cursor: pointer;
-            border-top: 1px solid #1a1a1a;
-        }
-
-        .ch-info.preview-highlight {
-            border-top: 1px solid var(--accent);
-            background: #081617; 
-        }
-
-        .ch-name { font-size: 11px; font-weight: 600; color: #ddd; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 70%; }
-
-        .mini-play-btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 18px;
-            height: 18px;
-            background: var(--accent);
-            border-radius: 50%;
-            margin-left: 8px;
-        }
-        .mini-play-btn svg { width: 8px; fill: #000; margin-left: 1px; }
-        
-        .fav-heart { position: absolute; top: 8px; right: 8px; z-index: 20; background: rgba(0,0,0,0.5); width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-        .fav-heart svg { width: 14px; fill: rgba(255,255,255,0.4); }
-        
-        /* ফেভারিট আইকন এখন সায়ান হবে */
-        .card.is-fav .fav-heart svg { fill: var(--primary); }
 
         @media (min-width: 768px) { .grid { grid-template-columns: repeat(5, 1fr); } }
     </style>
@@ -127,10 +105,11 @@
 
 <div class="fixed-top-container">
     <div class="video-box">
-        <video id="player" controls autoplay playsinline poster="https://via.placeholder.com/640x360/000/fff?text=RoarZone+TV"></video>
+        <video id="player" controls autoplay playsinline poster="https://via.placeholder.com/640x360/000/fff?text=Rivo+TV"></video>
     </div>
     <div class="controls-area">
         <div class="top-nav">
+            <div class="brand-name">RIVO</div>
             <div id="recent-header-list"></div>
             <button class="search-trigger" style="background:#1a1a1a; border:1px solid #333; border-radius:8px; width:36px; height:36px; display:flex; align-items:center; justify-content:center;">
                 <svg width="16" fill="#aaa" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
@@ -141,6 +120,9 @@
             <div class="cat-pill" onclick="filterData('FAVORITE', this)">⭐ Favorite</div>
             <div class="cat-pill" onclick="filterData('SPORTS', this)">Sports</div>
             <div class="cat-pill" onclick="filterData('BANGLA', this)">Bangla</div>
+            <div class="cat-pill download-btn-fire" onclick="window.open('আপনার_লিংক_এখানে', '_blank')">
+                Rivo TV 📥
+            </div>
         </div>
     </div>
 </div>
@@ -174,6 +156,7 @@
             if (l.startsWith('#EXTINF')) {
                 item.name = l.split(',')[1]?.trim() || "TV";
                 item.logo = l.match(/tvg-logo="(.*?)"/)?.[1] || "";
+                item.group = l.match(/group-title="(.*?)"/)?.[1] || "";
             } else if (l.startsWith('http')) {
                 item.url = l.trim();
                 allChannels.push({...item});
@@ -220,9 +203,7 @@
         const progressBar = container.querySelector('.preview-progress-bar');
 
         if (activeInlinePlayer) stopPreview();
-
-        infoBox.classList.add('preview-highlight');
-        currentActiveInfo = infoBox;
+        infoBox.style.borderTop = "1.5px solid var(--primary)";
 
         if (Hls.isSupported()) {
             const hls = new Hls();
@@ -235,6 +216,7 @@
                 progressBar.style.animation = 'progressAnim 10s linear forwards';
                 inlineVideo.play();
                 activeInlinePlayer = inlineVideo;
+                currentActiveInfo = infoBox;
                 previewTimeout = setTimeout(stopPreview, 10000);
             });
         }
@@ -248,14 +230,14 @@
             const container = activeInlinePlayer.closest('.preview-container');
             container.querySelector('.logo-area').style.display = 'flex';
             container.querySelector('.preview-progress-container').style.display = 'none';
-            container.querySelector('.preview-progress-bar').style.animation = 'none';
-            if (currentActiveInfo) currentActiveInfo.classList.remove('preview-highlight');
+            if (currentActiveInfo) currentActiveInfo.style.borderTop = "1px solid #1a1a1a";
             clearTimeout(previewTimeout);
             activeInlinePlayer = null;
         }
     }
 
     function playMain(url) {
+        stopPreview();
         if (Hls.isSupported()) {
             const hls = new Hls();
             hls.loadSource(url);
@@ -266,11 +248,12 @@
         recents = [url, ...recents.filter(u => u !== url)].slice(0, 10);
         localStorage.setItem('recent_v13', JSON.stringify(recents));
         renderRecentIcons();
+        window.scrollTo({top: 0, behavior: 'smooth'});
     }
 
     function renderRecentIcons() {
         const container = document.getElementById('recent-header-list');
-        if (recents.length === 0 || allChannels.length === 0) return;
+        if (!container || recents.length === 0) return;
         const recentData = recents.map(url => allChannels.find(c => c.url === url)).filter(Boolean);
         container.innerHTML = recentData.map(ch => `
             <div class="recent-mini-circle" onclick="playMain('${ch.url}')">
@@ -297,7 +280,7 @@
         el.classList.add('active');
         let filtered = type === 'ALL' ? allChannels : 
                        type === 'FAVORITE' ? allChannels.filter(c => favs.includes(c.url)) :
-                       allChannels.filter(c => (c.group+c.name).toUpperCase().includes(type.toUpperCase()));
+                       allChannels.filter(c => (c.group + c.name).toUpperCase().includes(type.toUpperCase()));
         render(filtered);
     }
 
