@@ -20,7 +20,7 @@
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
-        body { background-color: var(--bg); color: var(--text); overflow-x: hidden; padding-bottom: 50px; }
+        body { background-color: var(--bg); color: var(--text); overflow-x: hidden; padding-bottom: 60px; }
 
         /* স্টিকি প্লেয়ার */
         .fixed-top-container {
@@ -43,26 +43,36 @@
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             text-transform: uppercase;
         }
+        .brand-name::after {
+            content: ""; width: 6px; height: 6px; background-color: #ff0000; border-radius: 50%;
+            display: inline-block; box-shadow: 0 0 8px #ff0000; animation: blink 1s infinite; margin-left: 4px;
+        }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
-        /* ক্যাটাগরি পিলস */
-        .cat-row { display: flex; gap: 5px; overflow-x: auto; padding: 8px 0; scrollbar-width: none; align-items: center; }
+        #recent-header-list { display: flex; gap: 5px; overflow-x: auto; scrollbar-width: none; flex-grow: 1; }
+        .recent-mini-circle { width: 30px; height: 30px; border-radius: 50%; background: #1a1a1a; padding: 3px; border: 1px solid #333; flex-shrink: 0; cursor: pointer; }
+        .recent-mini-circle img { width: 100%; height: 100%; object-fit: contain; border-radius: 50%; }
+
+        /* ক্যাটাগরি রো */
+        .cat-row { display: flex; gap: 5px; overflow-x: auto; padding: 8px 0; scrollbar-width: none; align-items: center; white-space: nowrap; }
         .cat-pill { padding: 4px 10px; background: #1a1a1a; border-radius: 12px; font-size: 9px; border: 1px solid #333; color: #aaa; cursor: pointer; }
         .cat-pill.active { background: rgba(0, 242, 255, 0.1); color: var(--primary); border-color: var(--primary); }
+
+        .download-btn-fire { background: linear-gradient(45deg, #ff4500, #ff8c00) !important; color: white !important; font-weight: 700 !important; animation: fire-burn 0.8s infinite alternate ease-in-out; }
+        @keyframes fire-burn { 0% { box-shadow: 0 0 4px #ff4500; transform: scale(1); } 100% { box-shadow: 0 0 10px #ff8c00; transform: scale(1.03); } }
 
         /* গ্রিড ও কার্ড */
         .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 10px; }
         .card { background: var(--card-bg); border-radius: 10px; overflow: hidden; position: relative; border: 1px solid #1a1a1a; }
-        .logo-area { height: 85px; background: radial-gradient(circle, #1a1a1a 0%, #050505 100%); display: flex; align-items: center; justify-content: center; padding: 12px; position: relative; overflow: hidden; }
+        .logo-area { height: 85px; background: radial-gradient(circle, #1a1a1a 0%, #050505 100%); display: flex; align-items: center; justify-content: center; padding: 12px; position: relative; }
         .logo-area img { max-height: 100%; max-width: 100%; object-fit: contain; }
         
-        /* প্রিভিউ ভিডিও প্লেয়ার */
         .preview-video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 5; background: #000; }
 
-        /* চ্যানেলের নাম ও প্লে আইকন */
         .ch-info { display: flex; align-items: center; gap: 6px; padding: 10px 5px; background: #0d0d0d; border-top: 1px solid #1a1a1a; cursor: pointer; }
         .ch-name { font-size: 10px; font-weight: 600; color: #eee; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        /* প্লে আইকন কাঁপানোর অ্যানিমেশন */
+        /* প্লে আইকন শেকিং */
         .play-icon-svg { transition: transform 0.2s; }
         .ch-info:active .play-icon-svg { animation: simple-shake 0.3s infinite ease-in-out; }
         @keyframes simple-shake {
@@ -71,20 +81,9 @@
             75% { transform: translateX(2px); }
         }
 
-        /* ইউনিক ক্রেডিট ফুটার */
-        .dev-credit {
-            text-align: center;
-            padding: 20px 0;
-            font-size: 8px;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            color: #444;
-        }
-        .dev-credit span {
-            color: var(--primary);
-            text-shadow: 0 0 5px var(--primary);
-            font-weight: 600;
-        }
+        /* ডেভলপার ক্রেডিট */
+        .dev-credit { text-align: center; padding: 15px 0; font-size: 8px; letter-spacing: 1px; text-transform: uppercase; color: #444; }
+        .dev-credit span { color: var(--primary); text-shadow: 0 0 5px var(--primary); font-weight: 600; }
 
         @media (min-width: 768px) { .grid { grid-template-columns: repeat(5, 1fr); } }
     </style>
@@ -98,12 +97,17 @@
     <div class="controls-area">
         <div class="top-nav">
             <div class="brand-name">RIVO TV</div>
-            <div id="recent-header-list" style="display:flex; gap:5px; overflow-x:auto;"></div>
+            <div id="recent-header-list"></div>
+            <button onclick="alert('Search feature coming soon!')" style="background:#1a1a1a; border:1px solid #333; border-radius:6px; width:30px; height:30px; display:flex; align-items:center; justify-content:center;">
+                <svg width="14" fill="#aaa" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+            </button>
         </div>
         <div class="cat-row">
             <div class="cat-pill active" onclick="filterData('ALL', this)">All</div>
             <div class="cat-pill" onclick="filterData('SPORTS', this)">Sports</div>
             <div class="cat-pill" onclick="filterData('BANGLA', this)">Bangla</div>
+            <div class="cat-pill download-btn-fire" onclick="window.open('YOUR_APP_LINK', '_blank')">App 📥</div>
+            <div class="cat-pill" style="border-color:var(--accent); color:var(--accent);" onclick="shareSite()">Share</div>
         </div>
     </div>
 </div>
@@ -133,6 +137,7 @@
     function parseM3U(data) {
         const lines = data.split('\n');
         let item = {};
+        allChannels = [];
         lines.forEach(l => {
             if (l.startsWith('#EXTINF')) {
                 item.name = l.split(',')[1]?.trim() || "TV";
@@ -144,13 +149,14 @@
             }
         });
         render(allChannels);
+        renderRecentIcons();
     }
 
     function render(data) {
         grid.innerHTML = data.map((ch, index) => `
             <div class="card">
                 <div class="logo-area" id="logo-box-${index}" onclick="playMain('${ch.url}')">
-                    <img src="${ch.logo}" id="img-${index}" onerror="this.src='https://via.placeholder.com/80?text=TV'">
+                    <img src="${ch.logo}" onerror="this.src='https://via.placeholder.com/80?text=TV'">
                 </div>
                 <div class="ch-info" onclick="startMiniPreview('${ch.url}', ${index})">
                     <svg class="play-icon-svg" width="14" height="14" viewBox="0 0 24 24" fill="none">
@@ -171,6 +177,10 @@
             hls.attachMedia(player);
             hls.on(Hls.Events.MANIFEST_PARSED, () => player.play());
         } else { player.src = url; player.play(); }
+
+        recents = [url, ...recents.filter(u => u !== url)].slice(0, 10);
+        localStorage.setItem('recent_rivo', JSON.stringify(recents));
+        renderRecentIcons();
         window.scrollTo({top: 0, behavior: 'smooth'});
     }
 
@@ -179,9 +189,7 @@
         const container = document.getElementById(`logo-box-${index}`);
         const videoElem = document.createElement('video');
         videoElem.className = 'preview-video';
-        videoElem.muted = true;
-        videoElem.autoplay = true;
-        videoElem.playsinline = true;
+        videoElem.muted = true; videoElem.autoplay = true; videoElem.playsinline = true;
         container.appendChild(videoElem);
 
         if (Hls.isSupported()) {
@@ -189,13 +197,37 @@
             activePreviewHls.loadSource(url);
             activePreviewHls.attachMedia(videoElem);
         } else { videoElem.src = url; }
-
         setTimeout(() => stopAllPreviews(), 10000);
     }
 
     function stopAllPreviews() {
         if (activePreviewHls) { activePreviewHls.destroy(); activePreviewHls = null; }
         document.querySelectorAll('.preview-video').forEach(el => el.remove());
+    }
+
+    function renderRecentIcons() {
+        const container = document.getElementById('recent-header-list');
+        const recentData = recents.map(url => allChannels.find(c => c.url === url)).filter(Boolean);
+        container.innerHTML = recentData.map(ch => `
+            <div class="recent-mini-circle" onclick="playMain('${ch.url}')">
+                <img src="${ch.logo}" onerror="this.src='https://via.placeholder.com/50'">
+            </div>
+        `).join('');
+    }
+
+    function filterData(type, el) {
+        document.querySelectorAll('.cat-pill').forEach(b => b.classList.remove('active'));
+        el.classList.add('active');
+        let filtered = type === 'ALL' ? allChannels : allChannels.filter(c => (c.name).toUpperCase().includes(type.toUpperCase()));
+        render(filtered);
+    }
+
+    function shareSite() {
+        if (navigator.share) {
+            navigator.share({ title: 'Rivo TV', url: window.location.href }).catch(console.error);
+        } else {
+            navigator.clipboard.writeText(window.location.href); alert("Link Copied!");
+        }
     }
 
     init();
