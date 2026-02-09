@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#050505">
-    <title>Rivo TV | Premium Live</title>
+    <title>Rivo TV | Premium Live Streaming</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
@@ -40,7 +40,7 @@
         .top-nav { display: flex; justify-content: space-between; align-items: center; gap: 6px; height: 45px; margin-bottom: 2px; }
         .brand-wrapper { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
         .brand-name { 
-            font-size: 16px; font-weight: 900; 
+            font-size: 17px; font-weight: 900; 
             background: linear-gradient(90deg, #fff, var(--primary), #fff);
             background-size: 200% auto;
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
@@ -48,52 +48,59 @@
         }
         @keyframes shine { to { background-position: 200% center; } }
 
-        .live-indicator { display: flex; align-items: center; gap: 3px; background: rgba(255, 0, 0, 0.1); padding: 2px 5px; border-radius: 4px; }
-        .dot { width: 5px; height: 5px; background-color: #ff0000; border-radius: 50%; box-shadow: 0 0 6px #ff0000; animation: pulse 1.5s infinite; }
-        .live-text { font-size: 7px; font-weight: 700; color: #ff0000; text-transform: uppercase; }
+        .live-indicator { display: flex; align-items: center; gap: 3px; background: rgba(255, 0, 0, 0.1); padding: 2px 6px; border-radius: 4px; border: 0.5px solid rgba(255, 0, 0, 0.2); }
+        .dot { width: 6px; height: 6px; background-color: #ff0000; border-radius: 50%; box-shadow: 0 0 6px #ff0000; animation: pulse 1.5s infinite; }
+        .live-text { font-size: 8px; font-weight: 800; color: #ff0000; text-transform: uppercase; letter-spacing: 0.5px; }
         @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.2); opacity: 0.5; } }
 
         /* রিসেন্ট আইকন লিস্ট */
-        #recent-header-list { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; flex-grow: 1; justify-content: flex-end; }
-        .recent-mini-circle { width: 30px; height: 30px; border-radius: 50%; background: #1a1a1a; padding: 2px; border: 1px solid #333; flex-shrink: 0; cursor: pointer; }
+        #recent-header-list { display: flex; gap: 5px; overflow-x: auto; scrollbar-width: none; flex-grow: 1; justify-content: flex-end; }
+        .recent-mini-circle { width: 32px; height: 32px; border-radius: 50%; background: #1a1a1a; padding: 2px; border: 1px solid #333; flex-shrink: 0; cursor: pointer; transition: 0.2s; }
+        .recent-mini-circle:active { transform: scale(0.9); }
         .recent-mini-circle img { width: 100%; height: 100%; object-fit: contain; border-radius: 50%; }
 
-        /* ক্যাটাগরি ও বাটন রো */
-        .cat-row { display: flex; gap: 5px; overflow-x: auto; padding: 5px 0 8px 0; scrollbar-width: none; align-items: center; }
+        /* ছোট ও প্রিমিয়াম ক্যাটাগরি পিল */
+        .cat-row { display: flex; gap: 5px; overflow-x: auto; padding: 6px 4px 10px 4px; scrollbar-width: none; align-items: center; }
         .cat-pill { 
-            padding: 5px 12px; background: #1a1a1a; border-radius: 10px; font-size: 10px; 
-            border: 1px solid #333; color: #aaa; cursor: pointer; white-space: nowrap;
-            display: flex; align-items: center; gap: 4px; transition: 0.2s;
+            padding: 4px 10px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; font-size: 9px; 
+            font-weight: 500; border: 1px solid rgba(255, 255, 255, 0.1); color: #bbb; cursor: pointer; 
+            white-space: nowrap; display: flex; align-items: center; gap: 3px; transition: all 0.3s ease;
         }
-        .cat-pill.active { background: rgba(0, 242, 255, 0.1); color: var(--primary); border-color: var(--primary); }
-        .download-btn-fire { background: linear-gradient(45deg, #ff4500, #ff8c00) !important; color: white !important; font-weight: 700 !important; animation: fire-burn 0.8s infinite alternate; }
-        @keyframes fire-burn { 0% { box-shadow: 0 0 4px #ff4500; } 100% { box-shadow: 0 0 8px #ff8c00; } }
+        .cat-pill.active { 
+            background: rgba(0, 242, 255, 0.15); color: var(--primary); border-color: var(--primary);
+            box-shadow: 0 0 8px rgba(0, 242, 255, 0.2);
+        }
+        .download-btn-fire { background: linear-gradient(45deg, #ff4500, #ff8c00) !important; color: white !important; font-weight: 700 !important; border: none !important; animation: fire-burn 0.8s infinite alternate; }
+        @keyframes fire-burn { 0% { box-shadow: 0 0 4px #ff4500; } 100% { box-shadow: 0 0 10px #ff8c00; } }
 
-        /* গ্রিড ডিজাইন */
-        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 10px; }
-        .card { background: var(--card-bg); border-radius: 10px; overflow: hidden; position: relative; border: 1px solid #1a1a1a; }
-        .logo-area { height: 90px; background: radial-gradient(circle, #1a1a1a 0%, #050505 100%); display: flex; align-items: center; justify-content: center; padding: 12px; position: relative; }
+        /* বড় সার্চ বাটন */
+        .search-pill { background: #1a1a1a !important; border-color: #444 !important; min-width: 85px; justify-content: center; font-weight: 600; color: #fff !important; }
+
+        /* গ্রিড ও কার্ড ডিজাইন */
+        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 12px; }
+        .card { background: var(--card-bg); border-radius: 12px; overflow: hidden; position: relative; border: 1px solid #1a1a1a; transition: 0.3s; }
+        .logo-area { height: 95px; background: radial-gradient(circle, #1a1a1a 0%, #050505 100%); display: flex; align-items: center; justify-content: center; padding: 15px; position: relative; }
         .logo-area img { max-height: 100%; max-width: 100%; object-fit: contain; z-index: 1; cursor: pointer; }
         
         /* ফেভারিট স্টার */
         .fav-star { 
             position: absolute; top: 6px; right: 6px; z-index: 15; cursor: pointer; 
-            width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; 
+            width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; 
             background: rgba(0,0,0,0.6); border-radius: 50%; transition: 0.3s;
         }
         .fav-star svg { fill: #555; transition: 0.3s; }
-        .fav-star.active svg { fill: #ffcc00; filter: drop-shadow(0 0 3px #ffcc00); }
+        .fav-star.active svg { fill: #ffcc00; filter: drop-shadow(0 0 4px #ffcc00); }
 
         /* মিনি প্রিভিউ ও প্রোগ্রেস বার */
         .preview-video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 10; background: #000; }
         .progress-container { position: absolute; bottom: 0; left: 0; width: 100%; height: 3px; background: rgba(255,255,255,0.1); z-index: 11; display: none; }
-        .progress-bar { height: 100%; width: 0%; background: var(--primary); box-shadow: 0 0 5px var(--primary); }
+        .progress-bar { height: 100%; width: 0%; background: var(--primary); box-shadow: 0 0 8px var(--primary); }
 
         .ch-info { display: flex; align-items: center; gap: 6px; padding: 10px 8px; background: #0d0d0d; border-top: 1px solid #1a1a1a; cursor: pointer; }
         .ch-name { font-size: 11px; font-weight: 600; color: #eee; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
         .dev-credit { text-align: center; padding: 30px 0; font-size: 9px; letter-spacing: 1px; color: #444; text-transform: uppercase; }
-        .dev-credit span { color: var(--primary); font-weight: 700; }
+        .dev-credit span { color: var(--primary); font-weight: 700; text-shadow: 0 0 5px rgba(0,242,255,0.2); }
 
         @media (min-width: 768px) { .grid { grid-template-columns: repeat(5, 1fr); } }
     </style>
@@ -102,7 +109,7 @@
 
 <div class="fixed-top-container">
     <div class="video-box">
-        <video id="player" controls autoplay playsinline poster="https://via.placeholder.com/640x360/000/fff?text=Rivo+TV+Streaming"></video>
+        <video id="player" controls autoplay playsinline poster="https://via.placeholder.com/640x360/000/fff?text=Rivo+TV+Live"></video>
     </div>
     <div class="controls-area">
         <div class="top-nav">
@@ -117,12 +124,21 @@
         </div>
         
         <div class="cat-row">
-            <div class="cat-pill active" onclick="filterData('ALL', this)">All</div>
-            <div class="cat-pill" onclick="filterFav(this)">⭐ Fav</div>
-            <div class="cat-pill" onclick="filterData('SPORTS', this)">Sports</div>
+            <div class="cat-pill active" onclick="filterData('ALL', this)">
+                <svg width="10" height="10" fill="currentColor" viewBox="0 0 24 24"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/></svg>
+                All
+            </div>
+            <div class="cat-pill" onclick="filterFav(this)">
+                <svg width="10" height="10" fill="#ffcc00" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                Fav
+            </div>
+            <div class="cat-pill" onclick="filterData('SPORTS', this)">
+                <svg width="10" height="10" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>
+                Sports
+            </div>
             <div class="cat-pill download-btn-fire" onclick="window.open('YOUR_APP_LINK', '_blank')">App 📥</div>
             <div class="cat-pill" style="border-color:var(--accent); color:var(--accent);" onclick="shareSite()">Share 🔗</div>
-            <div class="cat-pill" onclick="toggleSearch()" style="min-width: 80px; justify-content: center; background: #222;">Search 🔍</div>
+            <div class="cat-pill search-pill" onclick="toggleSearch()">Search 🔍</div>
         </div>
     </div>
 </div>
@@ -145,7 +161,7 @@
             const res = await fetch(M3U_URL);
             const data = await res.text();
             parseM3U(data);
-        } catch (e) { console.error("Error loading M3U:", e); }
+        } catch (e) { console.error("Load Error:", e); }
     }
 
     function parseM3U(data) {
@@ -200,8 +216,7 @@
 
     function filterFav(el) {
         setActive(el);
-        const favData = allChannels.filter(ch => favorites.includes(ch.url));
-        render(favData);
+        render(allChannels.filter(ch => favorites.includes(ch.url)));
     }
 
     function toggleSearch() {
@@ -225,6 +240,7 @@
         recents = [url, ...recents.filter(u => u !== url)].slice(0, 10);
         localStorage.setItem('recent_rivo', JSON.stringify(recents));
         renderRecentIcons();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function startMiniPreview(url, index) {
