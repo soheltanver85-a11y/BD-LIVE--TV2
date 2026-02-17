@@ -9,81 +9,46 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Orbitron:wght@900&display=swap" rel="stylesheet">
     
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-    <script src="https://cdn.dashjs.org/latest/dash.all.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.3.5/shaka-player.compiled.debug.min.js"></script>
     
     <style>
         :root { 
             --primary: #00f2ff; --fire: #ff4500; --bg: #050505; 
             --card-bg: #0f0f0f; --text: #fff; --accent: #7d5fff;
         }
-
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
         body { background-color: var(--bg); color: var(--text); overflow-x: hidden; padding-bottom: 50px; }
-
         .fixed-top-container { position: sticky; top: 0; z-index: 2000; background: var(--bg); width: 100%; box-shadow: 0 4px 20px rgba(0,0,0,0.9); }
         .video-box { background: #000; border-bottom: 2px solid var(--primary); }
         video#player { width: 100%; aspect-ratio: 16/9; display: block; background: #000; }
-
         .controls-area { padding: 4px 8px; }
         .top-nav { display: flex; justify-content: space-between; align-items: center; gap: 6px; height: 50px; }
-        
-        .brand-wrapper { display: flex; align-items: center; gap: 8px; }
-
         .brand-name { 
             font-family: 'Orbitron', sans-serif; font-size: 22px; font-weight: 900; color: #fff;
-            text-transform: uppercase; letter-spacing: 1px;
             text-shadow: 0 0 4px #fff, 0 -1px 4px #ff0, 2px -2px 6px #ff8000, -2px -4px 10px #f00;
             animation: flicker 1.5s infinite alternate;
         }
-
-        @keyframes flicker {
-            0% { text-shadow: 0 0 4px #fff, 0 -1px 4px #ff0, 2px -2px 6px #ff8000, -2px -4px 10px #f00; }
-            50% { text-shadow: 0 0 4px #fff, 0 -2px 10px #ff0, 5px -5px 15px #ff8000, -5px -10px 20px #f00; }
-            100% { text-shadow: 0 0 4px #fff, 0 -1px 4px #ff0, 2px -2px 6px #ff8000, -2px -4px 10px #f00; }
-        }
-
+        @keyframes flicker { 0% { opacity: 0.9; } 100% { opacity: 1; } }
         .status-indicator { display: flex; align-items: center; gap: 4px; background: rgba(0, 242, 255, 0.1); padding: 2px 6px; border-radius: 20px; border: 0.5px solid rgba(0, 242, 255, 0.3); }
-        .status-dot { width: 6px; height: 6px; background: var(--primary); border-radius: 50%; animation: blink 1.2s infinite; box-shadow: 0 0 8px var(--primary); }
-        @keyframes blink { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+        .status-dot { width: 6px; height: 6px; background: var(--primary); border-radius: 50%; animation: blink 1.2s infinite; }
+        @keyframes blink { 50% { opacity: 0.3; } }
         .status-text { font-size: 8px; font-weight: 700; color: var(--primary); text-transform: uppercase; }
-
         #recent-header-list { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; flex-grow: 1; justify-content: flex-end; max-width: 160px; }
         .recent-mini-circle { width: 34px; height: 34px; border-radius: 50%; background: #1a1a1a; padding: 2px; border: 1.5px solid var(--primary); flex-shrink: 0; }
         .recent-mini-circle img { width: 100%; height: 100%; object-fit: contain; border-radius: 50%; }
-
-        .cat-row { display: flex; gap: 5px; overflow-x: auto; padding: 8px 4px; scrollbar-width: none; align-items: center; }
+        .cat-row { display: flex; gap: 5px; overflow-x: auto; padding: 8px 4px; scrollbar-width: none; }
         .cat-pill { padding: 5px 12px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; font-size: 10px; border: 1px solid rgba(255, 255, 255, 0.1); color: #bbb; white-space: nowrap; cursor: pointer; }
         .cat-pill.active { background: rgba(0, 242, 255, 0.15); color: var(--primary); border-color: var(--primary); }
-
-        .search-container { padding: 0 8px 10px 8px; display: none; }
-        .search-container.active { display: block; }
-        .search-input { width: 100%; padding: 10px; background: #151515; border: 1px solid #333; border-radius: 10px; color: #fff; outline: none; }
-
         .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 12px; }
         .card { background: var(--card-bg); border-radius: 12px; overflow: hidden; position: relative; border: 1px solid #1a1a1a; }
-        .logo-area { height: 95px; background: radial-gradient(circle, #1a1a1a 0%, #050505 100%); display: flex; align-items: center; justify-content: center; padding: 15px; position: relative; cursor: pointer; }
+        .logo-area { height: 95px; background: #000; display: flex; align-items: center; justify-content: center; padding: 15px; cursor: pointer; }
         .logo-area img { max-height: 100%; max-width: 100%; object-fit: contain; }
-        
-        .fav-star { position: absolute; top: 6px; right: 6px; z-index: 15; cursor: pointer; background: rgba(0,0,0,0.6); padding: 5px; border-radius: 50%; display: flex; }
-        .fav-star svg { fill: #555; transition: 0.3s; }
+        .ch-info { padding: 10px 8px; background: #0d0d0d; border-top: 1px solid #1a1a1a; font-size: 11px; cursor: pointer; }
+        .fav-star { position: absolute; top: 6px; right: 6px; z-index: 15; background: rgba(0,0,0,0.6); padding: 5px; border-radius: 50%; display: flex; cursor: pointer; }
         .fav-star.active svg { fill: #ffcc00; }
-
-        .progress-container { position: absolute; bottom: 0; left: 0; width: 100%; height: 3px; background: rgba(255,255,255,0.1); z-index: 11; display: none; }
-        .progress-bar { height: 100%; width: 0%; background: var(--primary); box-shadow: 0 0 8px var(--primary); transition: width 10s linear; }
-
-        .ch-info { display: flex; align-items: center; gap: 6px; padding: 10px 8px; background: #0d0d0d; border-top: 1px solid #1a1a1a; cursor: pointer; }
-        .ch-name { font-size: 11px; font-weight: 600; color: #eee; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-
         #exitModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: flex-end; }
-        .modal-content { background: #111; width: 100%; padding: 30px; border-radius: 25px 25px 0 0; text-align: center; border-top: 3px solid var(--primary); animation: slideUp 0.3s; }
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-        .modal-btns { display: flex; gap: 15px; justify-content: center; margin-top: 20px; }
-        .m-btn { padding: 12px 35px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; }
-        .btn-yes { background: var(--primary); color: #000; }
-        .btn-no { background: #333; color: #fff; }
-
-        .dev-credit { text-align: center; padding: 30px 0; font-size: 9px; color: #444; }
-        @media (min-width: 768px) { .grid { grid-template-columns: repeat(5, 1fr); } }
+        .modal-content { background: #111; width: 100%; padding: 30px; border-radius: 25px 25px 0 0; text-align: center; border-top: 3px solid var(--primary); }
+        .m-btn { padding: 12px 35px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; margin: 5px; }
     </style>
 </head>
 <body>
@@ -92,58 +57,47 @@
     <div class="video-box"><video id="player" controls autoplay playsinline></video></div>
     <div class="controls-area">
         <div class="top-nav">
-            <div class="brand-wrapper">
-                <div class="brand-name">RIVO TV</div>
-                <div class="status-indicator"><div class="status-dot"></div><span class="status-text">Online</span></div>
-            </div>
+            <div class="brand-wrapper"><div class="brand-name">RIVO TV</div></div>
             <div id="recent-header-list"></div>
         </div>
         <div class="cat-row">
             <div class="cat-pill active" onclick="filterData('ALL', this)">All</div>
             <div class="cat-pill" onclick="filterFav(this)">Favorite ⭐</div>
-            <div class="cat-pill" onclick="toggleSearch()">Search 🔍</div>
-            <div class="cat-pill" onclick="shareSite()">Share 🔗</div>
-            <div class="cat-pill" style="background:var(--fire); color:#fff; border:none;" onclick="window.open('YOUR_APP_LINK')">Get App 📥</div>
-        </div>
-        <div class="search-container" id="searchWrapper">
-            <input type="text" id="searchInput" class="search-input" placeholder="Search for channels..." oninput="liveSearch()">
         </div>
     </div>
 </div>
 
 <div class="grid" id="mainGrid"></div>
-<div class="dev-credit">Developed by <span>Sohel Tanvir</span></div>
 
 <div id="exitModal">
     <div class="modal-content">
-        <p style="font-size: 18px; color:#fff;">Do you want to exit the app?</p>
-        <div class="modal-btns">
-            <button class="m-btn btn-no" onclick="closeExitModal()">No</button>
-            <button class="m-btn btn-yes" onclick="realExit()">Yes</button>
-        </div>
+        <p style="color:#fff;">Exit the app?</p>
+        <button class="m-btn" onclick="closeExitModal()" style="background:#333; color:#fff;">No</button>
+        <button class="m-btn" onclick="realExit()" style="background:var(--primary);">Yes</button>
     </div>
 </div>
 
 <script>
     const M3U_URL = "https://raw.githubusercontent.com/soheltanver85-a11y/Live-tv2/main/Live-tv2";
-    let allChannels = [], recents = JSON.parse(localStorage.getItem('recent_rivo')) || [], favorites = JSON.parse(localStorage.getItem('fav_rivo')) || [];
-    let activeMainHls = null, activeMainDash = null;
-    let activePreviewHls = null, activePreviewDash = null;
-    const player = document.getElementById('player'), grid = document.getElementById('mainGrid');
-
-    let touchStartX = 0, touchEndX = 0;
+    let allChannels = [], favorites = JSON.parse(localStorage.getItem('fav_rivo')) || [];
+    let shakaPlayer = null, hlsPlayer = null;
+    const video = document.getElementById('player');
 
     async function init() {
+        shaka.polyfil.installAll();
+        shakaPlayer = new shaka.Player(video);
+        shakaPlayer.addEventListener('error', e => console.error('Shaka Error:', e.detail));
+        
         try {
             const res = await fetch(M3U_URL);
             const data = await res.text();
             parseM3U(data);
-        } catch (e) { console.log("Load Fail"); }
+        } catch (e) { console.log("Init Error"); }
     }
 
     function parseM3U(data) {
         const lines = data.split('\n');
-        let item = {}; allChannels = [];
+        let item = {};
         lines.forEach(l => {
             if (l.startsWith('#EXTINF')) {
                 item.name = l.split(',')[1]?.trim() || "Live TV";
@@ -155,111 +109,42 @@
             }
         });
         render(allChannels);
-        renderRecentIcons();
     }
 
     function render(data) {
-        grid.innerHTML = data.map((ch, index) => {
-            const isFav = favorites.includes(ch.url);
-            return `
+        document.getElementById('mainGrid').innerHTML = data.map((ch, index) => `
             <div class="card">
-                <div class="fav-star ${isFav?'active':''}" onclick="toggleFav('${ch.url}', this)">
-                    <svg viewBox="0 0 24 24" width="14" height="14"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                <div class="fav-star ${favorites.includes(ch.url)?'active':''}" onclick="toggleFav('${ch.url}', this)">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="#555"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
                 </div>
-                <div class="logo-area" id="logo-box-${index}" onclick="playMain('${ch.url}')">
+                <div class="logo-area" onclick="playMain('${ch.url}')">
                     <img src="${ch.logo}" onerror="this.src='https://via.placeholder.com/80?text=TV'">
-                    <div class="progress-container" id="prog-cont-${index}"><div class="progress-bar" id="prog-bar-${index}"></div></div>
                 </div>
-                <div class="ch-info" onclick="startMiniPreview('${ch.url}', ${index})">
-                    <span class="ch-name">▶ ${ch.name}</span>
-                </div>
-            </div>`;
-        }).join('');
+                <div class="ch-info" onclick="playMain('${ch.url}')">▶ ${ch.name}</div>
+            </div>`).join('');
     }
 
-    // Unified player to handle both HLS and DASH (MPD)
-    function playMain(url) {
-        stopAllPreviews();
-        
-        // Reset previous players
-        if (activeMainHls) { activeMainHls.destroy(); activeMainHls = null; }
-        if (activeMainDash) { activeMainDash.reset(); activeMainDash = null; }
+    async function playMain(url) {
+        if (hlsPlayer) { hlsPlayer.destroy(); hlsPlayer = null; }
+        await shakaPlayer.unload();
 
         if (url.includes('.mpd')) {
-            // Play DASH (MPD)
-            activeMainDash = dashjs.MediaPlayer().create();
-            activeMainDash.initialize(player, url, true);
+            try {
+                await shakaPlayer.load(url);
+                video.play();
+            } catch (e) { alert("MPD Load Failed (Check CORS or Link)"); }
         } else if (url.includes('.m3u8')) {
-            // Play HLS
             if (Hls.isSupported()) {
-                activeMainHls = new Hls();
-                activeMainHls.loadSource(url);
-                activeMainHls.attachMedia(player);
-                activeMainHls.on(Hls.Events.MANIFEST_PARSED, () => player.play());
-            } else if (player.canPlayType('application/vnd.apple.mpegurl')) {
-                player.src = url;
-                player.play();
-            }
+                hlsPlayer = new Hls();
+                hlsPlayer.loadSource(url);
+                hlsPlayer.attachMedia(video);
+                hlsPlayer.on(Hls.Events.MANIFEST_PARSED, () => video.play());
+            } else { video.src = url; video.play(); }
         } else {
-            // Fallback for regular mp4 or other types
-            player.src = url;
-            player.play();
+            video.src = url; video.play();
         }
-
-        recents = [url, ...recents.filter(u => u !== url)].slice(0, 5);
-        localStorage.setItem('recent_rivo', JSON.stringify(recents));
-        renderRecentIcons();
     }
 
-    function startMiniPreview(url, index) {
-        stopAllPreviews();
-        const container = document.getElementById(`logo-box-${index}`);
-        const progCont = document.getElementById(`prog-cont-${index}`);
-        const progBar = document.getElementById(`prog-bar-${index}`);
-        
-        const videoElem = document.createElement('video');
-        videoElem.className = 'preview-video';
-        videoElem.style.cssText = "position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; z-index:10; border-radius:12px;";
-        videoElem.muted = true; videoElem.autoplay = true; videoElem.playsinline = true;
-        videoElem.onclick = (e) => { e.stopPropagation(); playMain(url); };
-        
-        container.appendChild(videoElem);
-        progCont.style.display = 'block';
-        setTimeout(() => { progBar.style.width = '100%'; }, 50);
-
-        if (url.includes('.mpd')) {
-            activePreviewDash = dashjs.MediaPlayer().create();
-            activePreviewDash.initialize(videoElem, url, true);
-        } else if (Hls.isSupported()) {
-            activePreviewHls = new Hls();
-            activePreviewHls.loadSource(url);
-            activePreviewHls.attachMedia(videoElem);
-        } else {
-            videoElem.src = url;
-        }
-
-        setTimeout(() => stopAllPreviews(), 10000);
-    }
-
-    function stopAllPreviews() {
-        if (activePreviewHls) { activePreviewHls.destroy(); activePreviewHls = null; }
-        if (activePreviewDash) { activePreviewDash.reset(); activePreviewDash = null; }
-        document.querySelectorAll('.preview-video').forEach(el => el.remove());
-        document.querySelectorAll('.progress-container').forEach(el => el.style.display = 'none');
-        document.querySelectorAll('.progress-bar').forEach(el => { el.style.width = '0%'; });
-    }
-
-    function renderRecentIcons() {
-        const container = document.getElementById('recent-header-list');
-        const recentData = recents.map(url => allChannels.find(c => c.url === url)).filter(Boolean);
-        container.innerHTML = recentData.map(ch => `<div class="recent-mini-circle" onclick="playMain('${ch.url}')"><img src="${ch.logo}" onerror="this.src='https://via.placeholder.com/50'"></div>`).join('');
-    }
-
-    function toggleSearch() { document.getElementById('searchWrapper').classList.toggle('active'); }
-    function liveSearch() {
-        const q = document.getElementById('searchInput').value.toLowerCase();
-        render(allChannels.filter(ch => ch.name.toLowerCase().includes(q)));
-    }
     function toggleFav(url, el) {
         event.stopPropagation();
         if (favorites.includes(url)) favorites = favorites.filter(f => f !== url);
@@ -267,22 +152,18 @@
         el.classList.toggle('active');
         localStorage.setItem('fav_rivo', JSON.stringify(favorites));
     }
-    function filterFav(el) { setActive(el); render(allChannels.filter(ch => favorites.includes(ch.url))); }
-    function filterData(type, el) { setActive(el); render(type==='ALL' ? allChannels : allChannels.filter(c => c.name.toUpperCase().includes(type.toUpperCase()))); }
-    function setActive(el) { document.querySelectorAll('.cat-pill').forEach(b => b.classList.remove('active')); el.classList.add('active'); }
-    function shareSite() {
-        if (navigator.share) navigator.share({ title: 'Rivo TV', url: window.location.href });
-        else alert("Link: " + window.location.href);
+
+    function filterData(type, el) { 
+        render(allChannels); 
+        document.querySelectorAll('.cat-pill').forEach(b => b.classList.remove('active'));
+        el.classList.add('active');
     }
 
-    window.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; });
-    window.addEventListener('touchend', e => {
-        touchEndX = e.changedTouches[0].screenX;
-        if (touchStartX - touchEndX > 80) openExitModal();
-    });
-    function openExitModal() { document.getElementById('exitModal').style.display = 'flex'; }
-    function closeExitModal() { document.getElementById('exitModal').style.display = 'none'; }
-    function realExit() { if(window.AppInterface) window.AppInterface.closeApp(); else { window.close(); history.back(); } }
+    function filterFav(el) {
+        render(allChannels.filter(ch => favorites.includes(ch.url)));
+        document.querySelectorAll('.cat-pill').forEach(b => b.classList.remove('active'));
+        el.classList.add('active');
+    }
 
     init();
 </script>
