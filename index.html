@@ -2,284 +2,244 @@
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zeno TV Premium - Ultimate Edition</title>
-    <link href="https://vjs.zencdn.net/8.10.0/video-js.css" rel="stylesheet" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#050505">
+    <title>Rivo TV | Premium Live Streaming</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Orbitron:wght@900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    
     <style>
         :root { 
-            --accent: #ff0000; 
-            --bg: #050505; 
-            --card: #1a1a1a; 
-            --gold: #ffd700; 
-            --premium: linear-gradient(45deg, #FFD700, #FFA500);
-            --blue-glow: #0088ff;
-            --refresh-color: #00c853;
-        }
-        
-        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; overflow: hidden; }
-
-        #player-wrapper { height: 45vh; width: 100%; background: #000; position: fixed; top: 0; left: 0; z-index: 200; border-bottom: 3px solid #333; }
-        .video-js { width: 100% !important; height: 100% !important; }
-        .vjs-volume-panel, .vjs-mute-control { display: none !important; }
-        
-        #ui-overlay { margin-top: 45vh; height: 55vh; overflow-y: auto; background: var(--bg); position: relative; scroll-behavior: smooth; }
-        
-        .zeno-logo { 
-            font-weight: 900; font-size: 24px; color: #fff; 
-            font-style: italic; margin-right: 15px; flex-shrink: 0;
-            text-shadow: 2px 2px #ff0000; letter-spacing: 1px;
-        }
-        .zeno-logo span { color: var(--accent); }
-
-        .fullscreen-btn {
-            position: fixed; top: 10px; right: 10px; z-index: 1000;
-            background: var(--premium); color: #000; border: none; padding: 10px 15px;
-            border-radius: 8px; cursor: pointer; font-weight: 900; 
-            font-size: 12px; transition: 0.3s; box-shadow: 0 0 15px rgba(255, 165, 0, 0.5);
+            --primary: #00f2ff; --fire: #ff4500; --bg: #050505; 
+            --card-bg: #0f0f0f; --text: #fff; --accent: #7d5fff;
         }
 
-        #search-overlay { display: none; position: absolute; left: 0; top: 0; width: 100%; height: 60px; background: #050505; z-index: 300; align-items: center; padding: 0 20px; border-bottom: 2px solid var(--accent); }
-        #search-input { flex: 1; padding: 10px; background: #1a1a1a; border: 1px solid #444; color: white; border-radius: 8px; outline: none; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background-color: var(--bg); color: var(--text); overflow-x: hidden; padding-bottom: 50px; }
 
-        .tabs-container { display: flex; align-items: center; gap: 10px; padding: 12px 20px; background: #050505; position: sticky; top: 0; z-index: 150; border-bottom: 2px solid #222; overflow-x: auto; scrollbar-width: none; }
-        .tab, .recent-pill, .apk-btn, .refresh-btn, .search-btn { padding: 8px 12px; border-radius: 8px; cursor: pointer; border: 2px solid transparent; background: #222; color: #eee; font-size: 12px; font-weight: bold; outline: none; display: flex; align-items: center; gap: 6px; white-space: nowrap; transition: 0.2s; }
-        .apk-btn { background: #007bff; }
-        .refresh-btn { background: var(--refresh-color); }
+        .fixed-top-container { position: sticky; top: 0; z-index: 2000; background: var(--bg); width: 100%; box-shadow: 0 4px 20px rgba(0,0,0,0.9); }
+        .video-box { background: #000; border-bottom: 2px solid var(--primary); }
+        video#player { width: 100%; aspect-ratio: 16/9; display: block; background: #000; }
 
-        .tab:focus, .card:focus, .refresh-btn:focus, .fullscreen-btn:focus { background: var(--accent) !important; color: #fff !important; transform: scale(1.05); outline: none; box-shadow: 0 0 20px rgba(255, 0, 0, 0.7); }
-
-        #main-content { padding: 20px 15px; min-height: 100vh; } 
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 20px; }
+        .controls-area { padding: 4px 8px; }
+        .top-nav { display: flex; justify-content: space-between; align-items: center; gap: 6px; height: 50px; }
         
-        .card { background: var(--card); border-radius: 15px; cursor: pointer; border: 2px solid #333; position: relative; transition: 0.3s; outline: none; overflow: hidden; }
-        .ch-index { position: absolute; top: 0; left: 0; background: var(--blue-glow); color: white; font-size: 18px; font-weight: 900; padding: 5px 12px; border-bottom-right-radius: 12px; z-index: 10; }
+        .brand-wrapper { display: flex; align-items: center; gap: 8px; }
+        .brand-name { 
+            font-family: 'Orbitron', sans-serif; font-size: 19px; font-weight: 900; 
+            background: linear-gradient(135deg, #fff 30%, var(--primary) 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 5px rgba(0, 242, 255, 0.4));
+        }
 
-        .fav-star { position: absolute; top: 5px; right: 5px; color: var(--gold); font-size: 18px; display: none; z-index: 10; text-shadow: 0 0 5px black; }
-        .is-fav .fav-star { display: block; }
+        .status-indicator { display: flex; align-items: center; gap: 4px; background: rgba(0, 242, 255, 0.1); padding: 2px 6px; border-radius: 20px; border: 0.5px solid rgba(0, 242, 255, 0.3); }
+        .status-dot { width: 6px; height: 6px; background: var(--primary); border-radius: 50%; animation: blink 1.2s infinite; box-shadow: 0 0 8px var(--primary); }
+        @keyframes blink { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+        .status-text { font-size: 8px; font-weight: 700; color: var(--primary); text-transform: uppercase; }
 
-        .logo-box { height: 85px; display: flex; align-items: center; justify-content: center; background: #111; margin: 5px; border-radius: 10px; }
-        .logo-box img { width: 75%; height: 75%; object-fit: contain; }
-        .name { padding: 10px; font-size: 12px; font-weight: bold; text-align: center; color: #ccc; }
+        #recent-header-list { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; flex-grow: 1; justify-content: flex-end; max-width: 160px; }
+        .recent-mini-circle { width: 34px; height: 34px; border-radius: 50%; background: #1a1a1a; padding: 2px; border: 1.5px solid var(--primary); flex-shrink: 0; }
+        .recent-mini-circle img { width: 100%; height: 100%; object-fit: contain; border-radius: 50%; }
 
-        #osd-number { position: fixed; top: 15%; left: 50%; transform: translateX(-50%); background: var(--accent); color: white; font-size: 70px; padding: 20px 50px; border-radius: 25px; display: none; z-index: 1000; font-weight: bold; }
+        .cat-row { display: flex; gap: 5px; overflow-x: auto; padding: 8px 4px; scrollbar-width: none; align-items: center; }
+        .cat-pill { padding: 5px 12px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; font-size: 10px; border: 1px solid rgba(255, 255, 255, 0.1); color: #bbb; white-space: nowrap; cursor: pointer; }
+        .cat-pill.active { background: rgba(0, 242, 255, 0.15); color: var(--primary); border-color: var(--primary); }
+
+        .search-container { padding: 0 8px 10px 8px; display: none; }
+        .search-container.active { display: block; }
+        .search-input { width: 100%; padding: 10px; background: #151515; border: 1px solid #333; border-radius: 10px; color: #fff; outline: none; }
+
+        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 12px; }
+        .card { background: var(--card-bg); border-radius: 12px; overflow: hidden; position: relative; border: 1px solid #1a1a1a; }
+        .logo-area { height: 95px; background: radial-gradient(circle, #1a1a1a 0%, #050505 100%); display: flex; align-items: center; justify-content: center; padding: 15px; position: relative; cursor: pointer; }
+        .logo-area img { max-height: 100%; max-width: 100%; object-fit: contain; }
+        
+        .fav-star { position: absolute; top: 6px; right: 6px; z-index: 15; cursor: pointer; background: rgba(0,0,0,0.6); padding: 5px; border-radius: 50%; display: flex; }
+        .fav-star svg { fill: #555; transition: 0.3s; }
+        .fav-star.active svg { fill: #ffcc00; }
+
+        .progress-container { position: absolute; bottom: 0; left: 0; width: 100%; height: 3px; background: rgba(255,255,255,0.1); z-index: 11; display: none; }
+        .progress-bar { height: 100%; width: 0%; background: var(--primary); box-shadow: 0 0 8px var(--primary); transition: width 10s linear; }
+
+        .ch-info { display: flex; align-items: center; gap: 6px; padding: 10px 8px; background: #0d0d0d; border-top: 1px solid #1a1a1a; cursor: pointer; }
+        .ch-name { font-size: 11px; font-weight: 600; color: #eee; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+        #exitModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: flex-end; }
+        .modal-content { background: #111; width: 100%; padding: 30px; border-radius: 25px 25px 0 0; text-align: center; border-top: 3px solid var(--primary); animation: slideUp 0.3s; }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .modal-btns { display: flex; gap: 15px; justify-content: center; margin-top: 20px; }
+        .m-btn { padding: 12px 35px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; }
+        .btn-yes { background: var(--primary); color: #000; }
+        .btn-no { background: #333; color: #fff; }
+
+        .dev-credit { text-align: center; padding: 30px 0; font-size: 9px; color: #444; }
+        @media (min-width: 768px) { .grid { grid-template-columns: repeat(5, 1fr); } }
     </style>
 </head>
 <body>
 
-<div id="osd-number"></div>
-<button class="fullscreen-btn" id="fs-btn" tabindex="0" onclick="toggleMainFullscreen()"><span>FULLSCREEN</span></button>
-
-<div id="player-wrapper">
-    <video id="tv-player" class="video-js vjs-default-skin vjs-big-play-centered" controls preload="auto"></video>
-</div>
-
-<div id="ui-overlay">
-    <div id="search-overlay">
-        <input type="text" id="search-input" placeholder="চ্যানেল খুঁজুন..." oninput="searchChannels(this.value)">
-        <button class="tab" onclick="toggleSearch(false)">বন্ধ</button>
-    </div>
-
-    <div class="tabs-container">
-        <div class="zeno-logo">ZENO<span> TV</span></div>
-        <div class="search-btn" tabindex="0" onclick="toggleSearch(true)">🔍</div>
-        <div class="tab" tabindex="0" onclick="filterCategory('All')">সব</div>
-        <div class="tab" tabindex="0" onclick="filterCategory('Favorite')">⭐ ফেভারিট</div>
-        <div class="apk-btn" tabindex="0" onclick="window.location.href='YOUR_LINK'">📥 APK</div>
-        <div class="refresh-btn" tabindex="0" onclick="location.reload()">🔄 রিফ্রেশ</div>
-        <div id="recent-box" style="display:flex; gap:8px;"></div>
-    </div>
-
-    <div id="main-content">
-        <div id="channel-grid" class="grid"></div>
+<div class="fixed-top-container">
+    <div class="video-box"><video id="player" controls autoplay playsinline></video></div>
+    <div class="controls-area">
+        <div class="top-nav">
+            <div class="brand-wrapper">
+                <div class="brand-name">RIVO TV</div>
+                <div class="status-indicator"><div class="status-dot"></div><span class="status-text">Online</span></div>
+            </div>
+            <div id="recent-header-list"></div>
+        </div>
+        <div class="cat-row">
+            <div class="cat-pill active" onclick="filterData('ALL', this)">All</div>
+            <div class="cat-pill" onclick="filterFav(this)">Fav тнР</div>
+            <div class="cat-pill" onclick="toggleSearch()">Search ЁЯФН</div>
+            <div class="cat-pill" onclick="shareSite()">Share ЁЯФЧ</div>
+            <div class="cat-pill" style="background:var(--fire); color:#fff; border:none;" onclick="window.open('YOUR_APP_LINK')">App ЁЯУе</div>
+        </div>
+        <div class="search-container" id="searchWrapper">
+            <input type="text" id="searchInput" class="search-input" placeholder="ржЪрзНржпрж╛ржирзЗрж▓ ржЦрзБржБржЬрзБржи..." oninput="liveSearch()">
+        </div>
     </div>
 </div>
 
-<script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/dashjs/4.7.1/dash.all.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/videojs-contrib-dash/dist/videojs-dash.min.js"></script>
+<div class="grid" id="mainGrid"></div>
+<div class="dev-credit">Developed by <span>Sohel Tanvir</span></div>
+
+<div id="exitModal">
+    <div class="modal-content">
+        <p style="font-size: 18px; color:#fff;">ржЖржкржирж┐ ржХрж┐ ржЕрзНржпрж╛ржк ржерзЗржХрзЗ ржмрзЗрж░ рж╣рждрзЗ ржЪрж╛ржи?</p>
+        <div class="modal-btns">
+            <button class="m-btn btn-no" onclick="closeExitModal()">ржирж╛</button>
+            <button class="m-btn btn-yes" onclick="realExit()">рж╣рзНржпрж╛ржБ</button>
+        </div>
+    </div>
+</div>
 
 <script>
-    const player = videojs('tv-player', {
-        html5: {
-            vhs: { overrideNative: true },
-            nativeAudioTracks: false,
-            nativeVideoTracks: false
-        }
-    });
+    const M3U_URL = "https://raw.githubusercontent.com/soheltanver85-a11y/Live-tv2/main/Live-tv2";
+    let allChannels = [], recents = JSON.parse(localStorage.getItem('recent_rivo')) || [], favorites = JSON.parse(localStorage.getItem('fav_rivo')) || [];
+    let activePreviewHls = null;
+    const player = document.getElementById('player'), grid = document.getElementById('mainGrid');
 
-    const m3uUrl = 'https://raw.githubusercontent.com/soheltanver85-a11y/Live-tv2/refs/heads/main/Live-tv2';
-    let allChannels = [], currentCh = null;
-    let favorites = JSON.parse(localStorage.getItem('zeno_favs')) || [];
-    let recents = JSON.parse(localStorage.getItem('zeno_recents')) || [];
-    let numBuffer = "", numTimeout = null, longPressTimer = null, fPressTimer = null;
-    let isLongPress = false, isFKeyHeld = false;
+    let touchStartX = 0, touchEndX = 0;
 
     async function init() {
         try {
-            const res = await fetch(m3uUrl);
+            const res = await fetch(M3U_URL);
             const data = await res.text();
-            const lines = data.split('\n');
-            let name = "", logo = "", group = "";
-            lines.forEach(line => {
-                if (line.includes('#EXTINF:')) {
-                    name = line.split(',').pop().trim();
-                    logo = (line.match(/tvg-logo="([^"]+)"/) || [])[1] || "";
-                    group = (line.match(/group-title="([^"]+)"/) || [])[1] || "";
-                } else if (line.startsWith('http')) {
-                    allChannels.push({ name, url: line.trim(), logo, group });
-                }
-            });
-            renderGrid(allChannels);
-            renderRecentPills();
-        } catch(e) { console.error("M3U Load Error:", e); }
+            parseM3U(data);
+        } catch (e) { console.log("Load Fail"); }
     }
 
-    function renderGrid(list) {
-        const grid = document.getElementById('channel-grid');
-        grid.innerHTML = '';
-        list.forEach((ch) => {
-            const isFav = favorites.includes(ch.url);
-            const card = document.createElement('div');
-            card.className = `card ${isFav ? 'is-fav' : ''}`;
-            card.tabIndex = 0;
-            const displayIdx = allChannels.findIndex(i => i.url === ch.url) + 1;
-            card.setAttribute('data-index', displayIdx);
-            card.innerHTML = `
-                <div class="ch-index">${displayIdx}</div>
-                <div class="fav-star">⭐</div>
-                <div class="logo-box"><img src="${ch.logo}" onerror="this.src='https://via.placeholder.com/150?text=TV'"></div>
-                <div class="name">${ch.name}</div>
-            `;
-
-            // Long Press (Mouse/Touch)
-            card.onmousedown = card.ontouchstart = (e) => {
-                isLongPress = false;
-                longPressTimer = setTimeout(() => {
-                    isLongPress = true;
-                    playChannel(ch);
-                    player.requestFullscreen();
-                }, 800);
-            };
-            card.onmouseup = card.ontouchend = () => clearTimeout(longPressTimer);
-            card.onclick = () => { if(!isLongPress) playChannel(ch); };
-
-            grid.appendChild(card);
-        });
-    }
-
-    function playChannel(ch) {
-        if(!ch) return;
-        currentCh = ch;
-        
-        let type = 'application/x-mpegURL'; // ডিফল্ট M3U8
-        if (ch.url.includes('.mpd')) {
-            type = 'application/dash+xml';
-        }
-
-        // DRM সাপোর্ট (যদি ভবিষ্যতে কি থাকে তবে এখানে যোগ করা যাবে)
-        player.src({
-            src: ch.url,
-            type: type
-        });
-
-        player.ready(() => {
-            player.play().catch(e => console.log("Playback error:", e));
-        });
-
-        recents = [ch, ...recents.filter(i => i.url !== ch.url)].slice(0, 4);
-        localStorage.setItem('zeno_recents', JSON.stringify(recents));
-        renderRecentPills();
-    }
-
-    // আপনার ফেভারিট অপশনটি আগের মতোই কাজ করবে
-    function toggleFavorite(ch, cardElement) {
-        if(!ch) return;
-        const index = favorites.indexOf(ch.url);
-        if (index === -1) {
-            favorites.push(ch.url);
-            cardElement.classList.add('is-fav');
-        } else {
-            favorites.splice(index, 1);
-            cardElement.classList.remove('is-fav');
-        }
-        localStorage.setItem('zeno_favs', JSON.stringify(favorites));
-    }
-
-    function renderRecentPills() {
-        const box = document.getElementById('recent-box');
-        box.innerHTML = '';
-        recents.forEach(ch => {
-            const pill = document.createElement('div');
-            pill.className = 'recent-pill';
-            pill.tabIndex = 0;
-            pill.innerHTML = `<img src="${ch.logo}"> <span>${ch.name.substring(0,6)}</span>`;
-            pill.onclick = () => playChannel(ch);
-            box.appendChild(pill);
-        });
-    }
-
-    function toggleSearch(show) {
-        const overlay = document.getElementById('search-overlay');
-        overlay.style.display = show ? 'flex' : 'none';
-        if(show) document.getElementById('search-input').focus();
-    }
-
-    function searchChannels(q) {
-        const filtered = allChannels.filter(c => c.name.toLowerCase().includes(q.toLowerCase()));
-        renderGrid(filtered);
-    }
-
-    function filterCategory(cat) {
-        let list = (cat === 'Favorite') ? allChannels.filter(c => favorites.includes(c.url)) : allChannels;
-        renderGrid(list);
-    }
-
-    function toggleMainFullscreen() {
-        if (!player.isFullscreen()) player.requestFullscreen();
-        else player.exitFullscreen();
-    }
-
-    // নম্বর প্যাড এবং 'F' বাটন নেভিগেশন
-    window.addEventListener('keydown', (e) => {
-        const active = document.activeElement;
-        
-        if (e.key >= '0' && e.key <= '9') {
-            numBuffer += e.key;
-            const osd = document.getElementById('osd-number');
-            osd.innerText = numBuffer; 
-            osd.style.display = 'block';
-            clearTimeout(numTimeout);
-            numTimeout = setTimeout(() => {
-                const targetIdx = parseInt(numBuffer);
-                const targetCard = document.querySelector(`.card[data-index="${targetIdx}"]`);
-                if (targetCard) {
-                    targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    targetCard.focus();
-                    targetCard.click();
-                }
-                numBuffer = ""; 
-                osd.style.display = 'none';
-            }, 1200);
-            return;
-        }
-
-        if (e.key.toLowerCase() === 'f' && active.classList.contains('card')) {
-            if (!isFKeyHeld) {
-                isFKeyHeld = true;
-                fPressTimer = setTimeout(() => {
-                    const idx = parseInt(active.getAttribute('data-index')) - 1;
-                    toggleFavorite(allChannels[idx], active);
-                }, 800);
+    function parseM3U(data) {
+        const lines = data.split('\n');
+        let item = {}; allChannels = [];
+        lines.forEach(l => {
+            if (l.startsWith('#EXTINF')) {
+                item.name = l.split(',')[1]?.trim() || "Live TV";
+                item.logo = l.match(/tvg-logo="(.*?)"/)?.[1] || "";
+            } else if (l.startsWith('http')) {
+                item.url = l.trim();
+                allChannels.push({...item});
+                item = {};
             }
-        }
-    });
+        });
+        render(allChannels);
+        renderRecentIcons();
+    }
 
-    window.addEventListener('keyup', (e) => {
-        if (e.key.toLowerCase() === 'f') {
-            clearTimeout(fPressTimer);
-            isFKeyHeld = false;
-        }
+    function render(data) {
+        grid.innerHTML = data.map((ch, index) => {
+            const isFav = favorites.includes(ch.url);
+            return `
+            <div class="card">
+                <div class="fav-star ${isFav?'active':''}" onclick="toggleFav('${ch.url}', this)">
+                    <svg viewBox="0 0 24 24" width="14" height="14"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                </div>
+                <div class="logo-area" id="logo-box-${index}" onclick="playMain('${ch.url}')">
+                    <img src="${ch.logo}" onerror="this.src='https://via.placeholder.com/80?text=TV'">
+                    <div class="progress-container" id="prog-cont-${index}"><div class="progress-bar" id="prog-bar-${index}"></div></div>
+                </div>
+                <div class="ch-info" onclick="startMiniPreview('${ch.url}', ${index})">
+                    <span class="ch-name">тЦ╢ ${ch.name}</span>
+                </div>
+            </div>`;
+        }).join('');
+    }
+
+    function playMain(url) {
+        stopAllPreviews();
+        if (Hls.isSupported()) {
+            const hls = new Hls(); hls.loadSource(url); hls.attachMedia(player);
+            hls.on(Hls.Events.MANIFEST_PARSED, () => player.play());
+        } else { player.src = url; player.play(); }
+        recents = [url, ...recents.filter(u => u !== url)].slice(0, 5);
+        localStorage.setItem('recent_rivo', JSON.stringify(recents));
+        renderRecentIcons();
+    }
+
+    function startMiniPreview(url, index) {
+        stopAllPreviews();
+        const container = document.getElementById(`logo-box-${index}`);
+        const progCont = document.getElementById(`prog-cont-${index}`);
+        const progBar = document.getElementById(`prog-bar-${index}`);
+        const videoElem = document.createElement('video');
+        videoElem.className = 'preview-video';
+        videoElem.style.cssText = "position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; z-index:10; border-radius:12px;";
+        videoElem.muted = true; videoElem.autoplay = true; videoElem.playsinline = true;
+        videoElem.onclick = (e) => { e.stopPropagation(); playMain(url); };
+        container.appendChild(videoElem);
+        progCont.style.display = 'block';
+        setTimeout(() => { progBar.style.width = '100%'; }, 50);
+        if (Hls.isSupported()) {
+            activePreviewHls = new Hls(); activePreviewHls.loadSource(url);
+            activePreviewHls.attachMedia(videoElem);
+            activePreviewHls.on(Hls.Events.MANIFEST_PARSED, () => videoElem.play());
+        } else { videoElem.src = url; videoElem.play(); }
+        setTimeout(() => stopAllPreviews(), 10000);
+    }
+
+    function stopAllPreviews() {
+        if (activePreviewHls) { activePreviewHls.destroy(); activePreviewHls = null; }
+        document.querySelectorAll('.preview-video').forEach(el => el.remove());
+        document.querySelectorAll('.progress-container').forEach(el => el.style.display = 'none');
+        document.querySelectorAll('.progress-bar').forEach(el => { el.style.width = '0%'; });
+    }
+
+    function renderRecentIcons() {
+        const container = document.getElementById('recent-header-list');
+        const recentData = recents.map(url => allChannels.find(c => c.url === url)).filter(Boolean);
+        container.innerHTML = recentData.map(ch => `<div class="recent-mini-circle" onclick="playMain('${ch.url}')"><img src="${ch.logo}" onerror="this.src='https://via.placeholder.com/50'"></div>`).join('');
+    }
+
+    function toggleSearch() { document.getElementById('searchWrapper').classList.toggle('active'); }
+    function liveSearch() {
+        const q = document.getElementById('searchInput').value.toLowerCase();
+        render(allChannels.filter(ch => ch.name.toLowerCase().includes(q)));
+    }
+    function toggleFav(url, el) {
+        event.stopPropagation();
+        if (favorites.includes(url)) favorites = favorites.filter(f => f !== url);
+        else favorites.push(url);
+        el.classList.toggle('active');
+        localStorage.setItem('fav_rivo', JSON.stringify(favorites));
+    }
+    function filterFav(el) { setActive(el); render(allChannels.filter(ch => favorites.includes(ch.url))); }
+    function filterData(type, el) { setActive(el); render(type==='ALL' ? allChannels : allChannels.filter(c => c.name.toUpperCase().includes(type.toUpperCase()))); }
+    function setActive(el) { document.querySelectorAll('.cat-pill').forEach(b => b.classList.remove('active')); el.classList.add('active'); }
+    function shareSite() {
+        if (navigator.share) navigator.share({ title: 'Rivo TV', url: window.location.href });
+        else alert("рж▓рж┐ржЩрзНржХ: " + window.location.href);
+    }
+
+    window.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; });
+    window.addEventListener('touchend', e => {
+        touchEndX = e.changedTouches[0].screenX;
+        if (touchStartX - touchEndX > 80) openExitModal();
     });
+    function openExitModal() { document.getElementById('exitModal').style.display = 'flex'; }
+    function closeExitModal() { document.getElementById('exitModal').style.display = 'none'; }
+    function realExit() { if(window.AppInterface) window.AppInterface.closeApp(); else { window.close(); history.back(); } }
 
     init();
 </script>
