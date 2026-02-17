@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -26,11 +26,25 @@
         .top-nav { display: flex; justify-content: space-between; align-items: center; gap: 6px; height: 50px; }
         
         .brand-wrapper { display: flex; align-items: center; gap: 8px; }
+
+        /* 🔥 Flaming Logo Style */
         .brand-name { 
-            font-family: 'Orbitron', sans-serif; font-size: 19px; font-weight: 900; 
-            background: linear-gradient(135deg, #fff 30%, var(--primary) 100%);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 5px rgba(0, 242, 255, 0.4));
+            font-family: 'Orbitron', sans-serif; 
+            font-size: 22px; 
+            font-weight: 900; 
+            color: #fff;
+            text-transform: uppercase;
+            position: relative;
+            letter-spacing: 1px;
+            /* Fire Glow Effect */
+            text-shadow: 0 0 4px #fff, 0 -1px 4px #ff0, 2px -2px 6px #ff8000, -2px -4px 10px #f00;
+            animation: flicker 1.5s infinite alternate;
+        }
+
+        @keyframes flicker {
+            0% { text-shadow: 0 0 4px #fff, 0 -1px 4px #ff0, 2px -2px 6px #ff8000, -2px -4px 10px #f00; }
+            50% { text-shadow: 0 0 4px #fff, 0 -2px 10px #ff0, 5px -5px 15px #ff8000, -5px -10px 20px #f00; }
+            100% { text-shadow: 0 0 4px #fff, 0 -1px 4px #ff0, 2px -2px 6px #ff8000, -2px -4px 10px #f00; }
         }
 
         .status-indicator { display: flex; align-items: center; gap: 4px; background: rgba(0, 242, 255, 0.1); padding: 2px 6px; border-radius: 20px; border: 0.5px solid rgba(0, 242, 255, 0.3); }
@@ -91,13 +105,13 @@
         </div>
         <div class="cat-row">
             <div class="cat-pill active" onclick="filterData('ALL', this)">All</div>
-            <div class="cat-pill" onclick="filterFav(this)">Fav тнР</div>
-            <div class="cat-pill" onclick="toggleSearch()">Search ЁЯФН</div>
-            <div class="cat-pill" onclick="shareSite()">Share ЁЯФЧ</div>
-            <div class="cat-pill" style="background:var(--fire); color:#fff; border:none;" onclick="window.open('YOUR_APP_LINK')">App ЁЯУе</div>
+            <div class="cat-pill" onclick="filterFav(this)">Favorite ⭐</div>
+            <div class="cat-pill" onclick="toggleSearch()">Search 🔍</div>
+            <div class="cat-pill" onclick="shareSite()">Share 🔗</div>
+            <div class="cat-pill" style="background:var(--fire); color:#fff; border:none;" onclick="window.open('YOUR_APP_LINK')">Get App 📥</div>
         </div>
         <div class="search-container" id="searchWrapper">
-            <input type="text" id="searchInput" class="search-input" placeholder="ржЪрзНржпрж╛ржирзЗрж▓ ржЦрзБржБржЬрзБржи..." oninput="liveSearch()">
+            <input type="text" id="searchInput" class="search-input" placeholder="Search for channels..." oninput="liveSearch()">
         </div>
     </div>
 </div>
@@ -107,15 +121,16 @@
 
 <div id="exitModal">
     <div class="modal-content">
-        <p style="font-size: 18px; color:#fff;">ржЖржкржирж┐ ржХрж┐ ржЕрзНржпрж╛ржк ржерзЗржХрзЗ ржмрзЗрж░ рж╣рждрзЗ ржЪрж╛ржи?</p>
+        <p style="font-size: 18px; color:#fff;">Do you want to exit the app?</p>
         <div class="modal-btns">
-            <button class="m-btn btn-no" onclick="closeExitModal()">ржирж╛</button>
-            <button class="m-btn btn-yes" onclick="realExit()">рж╣рзНржпрж╛ржБ</button>
+            <button class="m-btn btn-no" onclick="closeExitModal()">No</button>
+            <button class="m-btn btn-yes" onclick="realExit()">Yes</button>
         </div>
     </div>
 </div>
 
 <script>
+    // Configuration
     const M3U_URL = "https://raw.githubusercontent.com/soheltanver85-a11y/Live-tv2/main/Live-tv2";
     let allChannels = [], recents = JSON.parse(localStorage.getItem('recent_rivo')) || [], favorites = JSON.parse(localStorage.getItem('fav_rivo')) || [];
     let activePreviewHls = null;
@@ -161,7 +176,7 @@
                     <div class="progress-container" id="prog-cont-${index}"><div class="progress-bar" id="prog-bar-${index}"></div></div>
                 </div>
                 <div class="ch-info" onclick="startMiniPreview('${ch.url}', ${index})">
-                    <span class="ch-name">тЦ╢ ${ch.name}</span>
+                    <span class="ch-name">▶ ${ch.name}</span>
                 </div>
             </div>`;
         }).join('');
@@ -229,7 +244,7 @@
     function setActive(el) { document.querySelectorAll('.cat-pill').forEach(b => b.classList.remove('active')); el.classList.add('active'); }
     function shareSite() {
         if (navigator.share) navigator.share({ title: 'Rivo TV', url: window.location.href });
-        else alert("рж▓рж┐ржЩрзНржХ: " + window.location.href);
+        else alert("Link: " + window.location.href);
     }
 
     window.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; });
